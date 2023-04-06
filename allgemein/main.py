@@ -1,10 +1,13 @@
-import ak1
-import ak2
-
-
-def print_hi(name):
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+from ak1 import prak1a1
+from allgemein import haeufigkeitsverteilung
 
 
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    prak1a1.start()
+
+
+    path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat.txt"
+    with open(path, "r") as f:
+        chiffrat = f.read()
+
+    haeufigkeitsverteilung.decrypt(chiffrat)

@@ -1,4 +1,4 @@
-from pythonProject.akAllgemein import converter
+from allgemein import converter
 from random import randrange
 
 

@@ -57,10 +57,10 @@ def encryptwithkey(decryptedraw, keyraw):
 
 def swapkeyletter(key, b1, b2, encr, decr):
     hreihenfolge = 'ENISRATDHULCGMOBWFKZPVJYXQ'
-    x = y = z = 0
 
-    key = key.replace(x, y)
-    key = key.replace(y, z)
+    key = key.replace(b1, 'y')
+    key = key.replace(b2, b1)
+    key = key.replace('y', b2)
     key = allcap(key)
     return key
 

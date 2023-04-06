@@ -88,24 +88,26 @@ def manual_decryption(klartext, mapping, chiffrat, freq):
 
 
 def start():
-    path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/KryptoShit/pythonProject/ak1/prak1Files/chiffrat.txt"
+    path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat.txt"
     with open(path, "r") as f:
         chiffrat = f.read()
+    print("Chiffrat: ")
+    print(chiffrat)
 
     chiffrat_freq = calculate_freq(chiffrat)
     print("Relative Häufigkeit der Buchstaben im Chiffrat:")
     print(chiffrat_freq)
 
     klartext, mapping = decrypt(chiffrat, chiffrat_freq)
-    print("Entschlüsselter Text:")
+    print("Entschlüsselter Text: ")
     print(klartext)
 
-    print("Schlüssel:")
+    print("Schlüssel: ")
     print(mapping)
 
     if input("Korrrekt? (j/n): ") == "n":
         klartext, mapping = manual_decryption(klartext, mapping, chiffrat, chiffrat_freq)
-        print("Endgültiger Klartext:")
+        print("Endgültiger Klartext: ")
         print(klartext)
-        print("Endgültiger Schlüssel:")
+        print("Endgültiger Schlüssel: ")
         print(mapping)

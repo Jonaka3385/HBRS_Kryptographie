@@ -52,10 +52,6 @@ def redecrypt(text, sorted_new_eng_freq, sorted_freq):
 
 
 def manual_decryption(klartext, mapping, chiffrat, freq):
-    print("Aktueller Klartext:")
-    print(klartext)
-    print("Aktueller Schlüssel:")
-    print(mapping)
     sorted_freq = sorted(freq.items(), key=lambda x: x[1], reverse=True)
     sorted_new_eng_freq = sorted(eng_freq.items(), key=lambda x: x[1], reverse=True)
 
@@ -78,8 +74,10 @@ def manual_decryption(klartext, mapping, chiffrat, freq):
             klartext, mapping = redecrypt(chiffrat, sorted_new_eng_freq, sorted_freq)
             print("Neuer Klartext:")
             print(klartext)
+            print()
             print("Neuer Schlüssel:")
             print(mapping)
+            print()
 
         if input("Weiter tauschen? (j/n): ") == "n":
             break
@@ -93,21 +91,26 @@ def start():
         chiffrat = f.read()
     print("Chiffrat: ")
     print(chiffrat)
+    print()
 
     chiffrat_freq = calculate_freq(chiffrat)
     print("Relative Häufigkeit der Buchstaben im Chiffrat:")
     print(chiffrat_freq)
+    print()
 
     klartext, mapping = decrypt(chiffrat, chiffrat_freq)
     print("Entschlüsselter Text: ")
     print(klartext)
+    print()
 
     print("Schlüssel: ")
     print(mapping)
+    print()
 
     if input("Korrrekt? (j/n): ") == "n":
         klartext, mapping = manual_decryption(klartext, mapping, chiffrat, chiffrat_freq)
         print("Endgültiger Klartext: ")
         print(klartext)
+        print()
         print("Endgültiger Schlüssel: ")
         print(mapping)

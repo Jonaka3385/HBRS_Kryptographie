@@ -1,6 +1,8 @@
 import string
 
 
+right_mapping = {'C': 'E', 'Q': 'T', 'P': 'I', 'S': 'A', 'E': 'N', 'B': 'O', 'K': 'S', 'M': 'R', 'G': 'C', 'T': 'L', 'L': 'H', 'O': 'D', 'Y': 'M', 'D': 'P', 'V': 'U', 'Z': 'Y', 'A': 'G', 'I': 'F', 'R': 'W', 'H': 'V', 'X': 'B', 'U': 'K', 'F': 'X', 'J': 'J', 'N': 'Z', 'W': 'Q'}
+
 # Buchstabenhäufigkeiten der englischen Sprache
 eng_freq = {"A": 0.0817, "B": 0.0149, "C": 0.0278, "D": 0.0425,
             "E": 0.1270, "F": 0.0223, "G": 0.0202, "H": 0.0609,
@@ -75,11 +77,11 @@ def manual_decryption(klartext, mapping, chiffrat, freq):
             print("Neuer Klartext:")
             print(klartext)
             print()
-            print("Neuer Schlüssel:")
+            print("Neuer Schlüssel(Mapping):")
             print(mapping)
             print()
 
-        if input("Weiter tauschen? (j/n): ") == "n":
+        if input("Jetzt korrekt? (j/n): ") == "j":
             break
 
     return klartext, mapping
@@ -103,7 +105,7 @@ def start():
     print(klartext)
     print()
 
-    print("Schlüssel: ")
+    print("Schlüssel(Mapping): ")
     print(mapping)
     print()
 
@@ -112,5 +114,27 @@ def start():
         print("Endgültiger Klartext: ")
         print(klartext)
         print()
-        print("Endgültiger Schlüssel: ")
+        print("Endgültiger Schlüssel(Mapping): ")
         print(mapping)
+
+
+def quickDecrypt(chiffrat, mapping):
+    result = ""
+    for char in chiffrat:
+        if char in mapping:
+            result += mapping[char]
+        else:
+            result += char
+    return result
+
+
+def quickstart():
+    path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat.txt"
+    with open(path, "r") as f:
+        chiffrat = f.read()
+    print("Chiffrat: ")
+    print(quickDecrypt(chiffrat, right_mapping))
+    print()
+    print("Schlüssel(Mapping): ")
+    print(right_mapping)
+    print()

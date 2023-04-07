@@ -90,7 +90,7 @@ def manual_decryption(klartext, mapping, chiffrat, freq):
 
 
 def start():
-    path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat.txt"
+    path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat1.txt"
     with open(path, "r") as f:
         chiffrat = f.read()
     print("Chiffrat: ")
@@ -131,7 +131,7 @@ def quickdecrypt(chiffrat, mapping):
 
 
 def quickstart():
-    path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat.txt"
+    path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat1.txt"
     with open(path, "r") as f:
         chiffrat = f.read()
     print("Chiffrat: ")

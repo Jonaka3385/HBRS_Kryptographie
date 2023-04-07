@@ -1,5 +1,5 @@
 import math
-
+from ak1 import prak1a1
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 letter_to_index = dict(zip(alphabet, range(len(alphabet))))
@@ -72,19 +72,51 @@ def calculate_coincidence_index(text):
     return coincidence_index
 
 
+def haeufigkeit(letters):
+    letters = letters.upper()
+    freq = prak1a1.calculate_freq(letters)
+    highest_letter = max(freq, key=freq.get)
+    highest_letter = highest_letter.lower()
+    i = 0
+    while highest_letter != 'e':
+        a = letter_to_index[highest_letter] - 1
+        i += 1
+        if a < 0:
+            a = 25
+        highest_letter = index_to_letter[a]
+    return index_to_letter[i]
+
+
+def haeufigkeitsanalyse(letters, a, gcd):
+    key = ""
+    for x in range(gcd):
+        x_letters = ""
+        for y in range(a-1):  # a-1 falls letztes Pattern unvollstädig
+            x_letters += letters[y][x]
+        key += haeufigkeit(x_letters)
+    return key
+
+
+def keyfinder(chiffrat, gcd):
+    split_chiffrat = [chiffrat[i:i + gcd] for i in range(0, len(chiffrat), gcd)]
+    a = len(split_chiffrat)
+    letters = [[None for _ in range(gcd)] for _ in range(a)]
+    i = 0
+    for each_split in split_chiffrat:
+        j = 0
+        for letter in each_split:
+            letters[i][j] = letter
+            j += 1
+        i += 1
+    key = haeufigkeitsanalyse(letters, a, gcd)
+    return key
+
+
 def decrypt(chiffrat):
     gcd = kasiskitest(chiffrat)
-    avg_coin_ind = 0
-    for i in range(int(len(chiffrat)/gcd)):
-        tmp = ""
-        for j in range(gcd):
-            tmp += chiffrat[i*gcd+j]
-        avg_coin_ind += calculate_coincidence_index(tmp)
-    avg_coin_ind = avg_coin_ind/(len(chiffrat)/gcd)
-    key = "a"*gcd
-    # key bestimmen
-    klartext = decryptwithkey(chiffrat, key)
-    return klartext
+    key = keyfinder(chiffrat, gcd)
+    klartext, key = decryptwithkey(chiffrat, key)
+    return klartext, key
 
 
 def decryptwithkey(chiffrat, key):
@@ -98,7 +130,21 @@ def decryptwithkey(chiffrat, key):
             decrypted += index_to_letter[number]
             i += 1
 
-    return decrypted
+    return decrypted, key
+
+
+def encryptwithkey(text, key):
+    encrypted = ""
+    split_chiffrat = [text[i:i + len(key)] for i in range(0, len(text), len(key))]
+
+    for each_split in split_chiffrat:
+        i = 0
+        for letter in each_split:
+            number = (letter_to_index[letter] + letter_to_index[key[i]]) % len(alphabet)
+            encrypted += index_to_letter[number]
+            i += 1
+
+    return encrypted, key
 
 
 def start():
@@ -106,5 +152,37 @@ def start():
     with open(path, "r") as f:
         chiffrat = f.read()
     chiffrat = chiffrat.lower()
-    klartext = decrypt(chiffrat).upper()
+    klartext, key = decrypt(chiffrat)
+    klartext = klartext.upper()
+    print("Klartext: ")
     print(klartext)
+    print()
+    print("Schlüssel: ")
+    print(key)
+    print()
+    while input("Korrekt(j/n)?: ") == "n":
+        key = input("Neuer Key-Vorschlag: ")
+        klartext, key = decryptwithkey(chiffrat, key)
+        klartext = klartext.upper()
+        print("Klartext: ")
+        print(klartext)
+        print()
+        print("Schlüssel: ")
+        print(key)
+        print()
+
+
+def quickstart():
+    path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2.txt"
+    with open(path, "r") as f:
+        chiffrat = f.read()
+    chiffrat = chiffrat.lower()
+    key = "fwqgczxugp"
+    klartext, key = decryptwithkey(chiffrat, key)
+    klartext = klartext.upper()
+    print("Klartext: ")
+    print(klartext)
+    print()
+    print("Schlüssel: ")
+    print(key)
+    print()

@@ -3,4 +3,4 @@ from ak1 import prak1a2
 
 
 if __name__ == '__main__':
-    prak1a2.start()
+    prak1a2.quickstart()

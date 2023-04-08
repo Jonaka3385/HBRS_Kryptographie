@@ -1,5 +1,4 @@
 import math
-from ak1 import prak1a1
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 letter_to_index = dict(zip(alphabet, range(len(alphabet))))
@@ -72,9 +71,21 @@ def calculate_coincidence_index(text):
     return coincidence_index
 
 
+def calculate_freq(text):
+    freq = {}
+    total = 0
+    for char in text:
+        if char in string.ascii_uppercase:
+            freq[char] = freq.get(char, 0) + 1
+            total += 1
+    for char in freq:
+        freq[char] = freq[char] / total
+    return freq
+
+
 def haeufigkeit(letters):
     letters = letters.upper()
-    freq = prak1a1.calculate_freq(letters)
+    freq = calculate_freq(letters)
     highest_letter = max(freq, key=freq.get)
     highest_letter = highest_letter.lower()
     i = 0

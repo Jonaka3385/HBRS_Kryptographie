@@ -86,13 +86,13 @@ def key_to_file(key, path_priv, path_pub):
 
 
 def start():
-    path_priv = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak2/prak1Files/priv_key.pem"
-    path_pub = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak2/prak1Files/pub_key.pem"
+    # path_priv = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak2/prak1Files/priv_key.pem"
+    # path_pub = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak2/prak1Files/pub_key.pem"
     bit_size = 3000
     exp = 65537  # 2^16 + 1
     key = generate_key_only(bit_size, exp)
     priv_key, pub_key = key_to_pem_string(key)
-    key_to_file(key, path_priv, path_pub)
+    # key_to_file(key, path_priv, path_pub)
     print("Key: ")
     print(priv_key)
     print()

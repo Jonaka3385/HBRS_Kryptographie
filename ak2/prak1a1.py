@@ -162,3 +162,4 @@ def start():
     text = ''.join(chr(int(binary[i:i + 8], 2)) for i in range(0, len(binary), 8)).encode('utf-8').decode('utf-8')
     print('Text2: \n', text)
     print('Text1 Ergebnis aus Ursprung; Text2 aus Faelschung \nFormatierungsprobleme')
+    print()

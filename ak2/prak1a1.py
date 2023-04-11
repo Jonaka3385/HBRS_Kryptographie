@@ -144,9 +144,9 @@ def start():
     print(f'{n}\n{e}\n{d}\n')
 
     message = "Hallo, Welt!"
-    message = message.encode('utf-8').decode('utf-8')
-    binary = ''.join(format(ord(c), '08b') for c in message)
-    int_num = int(binary, 2)
+    message_bytes = message.encode('utf-8')
+    byte_menge = len(message_bytes)
+    int_num = int.from_bytes(message_bytes, byteorder='big')
 
     signature = signatur(int_num, n, d)
     print('Signature: \n', signature)
@@ -155,11 +155,12 @@ def start():
     faelschung = universelle_faelschung(int_num, n, e, d)
     print('Faelschung: \n', faelschung)
 
-    binary = bin(int_num)[2:]
-    text = ''.join(chr(int(binary[i:i + 8], 2)) for i in range(0, len(binary), 8)).encode('utf-8').decode('utf-8')
-    print('Text1: \n', text)
-    binary = bin(faelschung)[2:]
-    text = ''.join(chr(int(binary[i:i + 8], 2)) for i in range(0, len(binary), 8)).encode('utf-8').decode('utf-8')
-    print('Text2: \n', text)
-    print('Text1 Ergebnis aus Ursprung; Text2 aus Faelschung \nFormatierungsprobleme')
+    bytes = int_num.to_bytes(byte_menge, byteorder='big')
+    clear = bytes.decode('utf-8')
+    print(clear)
+
+    bytes = faelschung.to_bytes(byte_menge, byteorder='big')
+    clear = bytes.decode('utf-8')
+    print(clear)
+
     print()

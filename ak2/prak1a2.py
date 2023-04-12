@@ -1,148 +1,196 @@
-from Cryptodome.Util.number import getPrime
-from Cryptodome.Util.number import getRandomRange
-from Cryptodome.Hash import SHA256
+from random import randrange
+from hashlib import sha256
+from math import ceil, sqrt
+from gmpy2 import xmpz, to_binary, invert, powmod, is_prime
+# gmpy2 für bessere Performance.
+# z.B. xmpz = schnellerer, größerer int
 
 
-def get_pars():
-    # key_length = 3072 dauert viel zu lange
-    key_length = 32
-
-    q = getPrime(key_length // 2)
+def generate_p_q(key_length, nn):
+    g = nn  # g >= 160
+    n = (key_length - 1) // g
+    b = (key_length - 1) % g
     while True:
-        p = getPrime(key_length)
-        if (p - 1) % q == 0:
-            break
+        # generate q
+        while True:
+            s = xmpz(randrange(1, 2 ** g))
+            a = sha256(to_binary(s)).hexdigest()
+            zz = xmpz((s + 1) % (2 ** g))
+            z = sha256(to_binary(zz)).hexdigest()
+            u = int(a, 16) ^ int(z, 16)
+            mask = 2 ** (nn - 1) + 1    # nn-1 und niedrigste Bit auf 1 setzen rest 0
+            q = u | mask                # u OR mask
+            if is_prime(q, 20):
+                break
+        # generate p
+        i = 0  # counter
+        j = 2  # offset
+        while i < 4096:
+            v = []
+            for k in range(n + 1):
+                arg = xmpz((s + j + k) % (2 ** g))
+                zzv = sha256(to_binary(arg)).hexdigest()
+                v.append(int(zzv, 16))
+            w = 0
+            for qq in range(0, n):
+                w += v[qq] * 2 ** (160 * qq)
+            w += (v[n] % 2 ** b) * 2 ** (160 * n)
+            x = w + 2 ** (key_length - 1)
+            c = x % (2 * q)
+            p = x - c + 1  # p = x - (c-1)
+            if p >= 2 ** (key_length - 1):
+                if is_prime(p, 10):
+                    return p, q
+            i += 1
+            j += n + 1
+
+
+def generate_g(p, q):
     while True:
-        g = getRandomRange(2, p - 1)
-        if pow(g, q, p) == 1 and pow(g, 2, p) != 1:
+        h = randrange(2, p - 1)
+        exp = xmpz((p - 1) // q)
+        g = powmod(h, exp, p)
+        if g > 1:
             break
-
-    x = getRandomRange(1, q - 1)
-
-    y = pow(g, x, p)
-
-    print("p:", p)
-    print("q:", q)
-    print("g:", g)
-    print("x:", x)
-    print("y:", y)
-
-    return p, q, g, x, y
+    return g
 
 
-def inverse(a, m):
-    r, prev_r = m, a
-    x, prev_x = 0, 1
-
-    while r != 0:
-        quotient = prev_r // r
-        prev_r, r = r, prev_r - quotient * r
-        prev_x, x = x, prev_x - quotient * x
-
-    if prev_r != 1:
-        raise ValueError("Inverse existiert nicht")
-
-    return prev_x % m
+def generate_params(key_length, nn):
+    p, q = generate_p_q(key_length, nn)
+    g = generate_g(p, q)
+    return p, q, g
 
 
-def sign(message, p, q, g, x):
-    hash_obj = SHA256.new(message)
-    h = int.from_bytes(hash_obj.digest(), byteorder='big')
-
-    k = getRandomRange(1, q - 1)
-
-    r = pow(g, k, p) % q
-    s = (inverse(k, q) * (h + x * r % q)) % q
-
-    return r, s, k
+def generate_keys(g, p, q):
+    x = randrange(2, q)  # x < q
+    y = powmod(g, x, p)
+    return x, y
 
 
-def sign_with_k_r(message, q, x, k, r):
-    hash_obj = SHA256.new(message)
-    h = int.from_bytes(hash_obj.digest(), byteorder='big')
-
-    s = (inverse(k, q) * (h + x * r % q)) % q
-
-    return r, s, k
-
-
-def veri(msg, p, q, g, y, r, s):
-    hash_obj = SHA256.new(msg)
-    h = int.from_bytes(hash_obj.digest(), byteorder='big')
-
-    s = int(s)
-    q = int(q)
-    # Signatur-Verifikation
-    w = pow(s, -1, q)
-    u1 = (h * w) % q
-    u2 = (r * w) % q
-    v = ((pow(g, u1, p) * pow(y, u2, p)) % p) % q
-
-    if v == r:
-        print("Signatur ist gültig!")
+def validate_params(p, q, g):
+    if is_prime(p) and is_prime(q):
         return True
-    else:
-        print("Signatur ist ungültig!")
+    if powmod(g, q, p) == 1 and g > 1 and (p - 1) % q:
+        return True
+    return False
+
+
+def validate_sign(r, s, q):
+    if 0 > r > q:
         return False
+    if 0 > s > q:
+        return False
+    return True
 
 
-def extended_euclidean_algorithm(a, b):
-    s, old_s = 0, 1
-    t, old_t = 1, 0
-    r, old_r = b, a
+def sign(msg, p, q, g, x):
+    if not validate_params(p, q, g):
+        raise Exception('Invalid params')
+    while True:
+        k = randrange(2, q)  # k < q
+        r = powmod(g, k, p) % q
+        m = int(sha256(msg).hexdigest(), 16)
+        try:
+            s = (invert(k, q) * (m + x * r)) % q
+            return r, s, k
+        except ZeroDivisionError:
+            pass
 
-    while r != 0:
-        quotient = old_r // r
-        old_r, r = r, old_r - quotient * r
-        old_s, s = s, old_s - quotient * s
-        old_t, t = t, old_t - quotient * t
 
-    return old_r, old_s, old_t
+def sign_with_k(msg, p, q, g, x, k):
+    if not validate_params(p, q, g):
+        raise Exception('Invalid params')
+    while True:
+        r = powmod(g, k, p) % q
+        m = int(sha256(msg).hexdigest(), 16)
+        try:
+            s = (invert(k, q) * (m + x * r)) % q
+            return r, s, k
+        except ZeroDivisionError:
+            pass
 
 
-def schluessel_berechnung(message_bytes1, message_bytes2, s1, s2, q):
-    hash_obj = SHA256.new(message_bytes1)
+def verify(msg, r, s, p, q, g, y):
+    if not validate_params(p, q, g):
+        raise Exception('Invalid params')
+    if not validate_sign(r, s, q):
+        return False
+    try:
+        w = invert(s, q)
+    except ZeroDivisionError:
+        return False
+    m = int(sha256(msg).hexdigest(), 16)
+    u1 = (m * w) % q
+    u2 = (r * w) % q
+    # v = ((g ** u1 * y ** u2) % p) % q
+    v = (powmod(g, u1, p) * powmod(y, u2, p)) % p % q
+    if v == r:
+        return True
+    return False
+
+
+def private_key_finder(msg1, msg2, s1, s2, p, q, g, r, y, k):
+    hash_obj = sha256(msg1)
     h1 = int.from_bytes(hash_obj.digest(), byteorder='big')
-    hash_obj = SHA256.new(message_bytes2)
+    hash_obj = sha256(msg2)
     h2 = int.from_bytes(hash_obj.digest(), byteorder='big')
 
     ds = s1 - s2
-    dh = inverse(h1 - h2, q)
-    kx = ds * inverse(dh, q) % q
-    x = (s1 * kx - h1) * inverse(kx, q) % q
+    dh = invert(h1 - h2, q)
+    kx = ds * invert(dh, q) % q
+    x = (s1 * kx - h1) * invert(kx, q) % q
 
     print(f'Privater Schlüssel: {x}')
     return x
 
 
-def start():
-    message = "Hallo, Welt!"
-    message_bytes = message.encode('utf-8')
+if __name__ == '__main__':
+    nn = 160
+    key_length = 1024
+    p, q, g = generate_params(key_length, nn)
+    x, y = generate_keys(g, p, q)
 
-    p, q, g, x, y = get_pars()
-    r, s, k = sign(message_bytes, p, q, g, x)
-    print(f'r: {r}\ns: {s}')
+    text = 'Hallo, Welt!'
+    msg = str.encode(text, 'utf-8')
+    r, s, k = sign(msg, p, q, g, x)
+    b = False
+    if verify(msg, r, s, p, q, g, y):
+        print('All ok')
+        b = True
+    print(f'msg: {msg}, ', f'r: {r}, ', f's: {s}, ', f'p: {p}, ', f'q: {q}, ', f'g: {g}, ', f'y: {y}, ', f'x: {x}', sep='\n')
 
-    if veri(message_bytes, p, q, g, y, r, s):
-        message_bytes1 = message_bytes
-        s1 = s
+    if b:
+        text1 = text
+        msg1, r1, s1, p1, q1, g1, y1, x1, k1 = msg, r, s, p, q, g, y, x, k
     else:
-        print("Fail!")
-        return
+        print('Fehlerhafte Parameter')
+        input('Trotzdem fortfahren?: ')
+        text1 = text
+        msg1, r1, s1, p1, q1, g1, y1, x1, k1 = msg, r, s, p, q, g, y, x, k
 
-    message = "Hallo, Menschen!"
-    message_bytes = message.encode('utf-8')
+    #
+    # next Text
 
-    r, s, k = sign_with_k_r(message_bytes, q, x, k, r)
-    print(f'r: {r}\ns: {s}')
+    text = 'Hallo, Menschen!'
+    msg = str.encode(text, 'utf-8')
+    r, s, k = sign_with_k(msg, p, q, g, x, k)
+    b = False
+    if verify(msg, r, s, p, q, g, y):
+        print('All ok')
+        b = True
+    print(f'msg: {msg}, ', f'r: {r}, ', f's: {s}, ', f'p: {p}, ', f'q: {q}, ', f'g: {g}, ', f'y: {y}, ', f'x: {x}', sep='\n')
 
-    if veri(message_bytes, p, q, g, y, r, s):
-        message_bytes2 = message_bytes
-        s2 = s
+    if b:
+        text2 = text
+        msg2, r2, s2, p2, q2, g2, y2, x2, k2 = msg, r, s, p, q, g, y, x, k
     else:
-        print("Fail!")
-        return
-    print(f'\nk: {k}\n')
+        print('Fehlerhafte Parameter')
+        input('Trotzdem fortfahren?: ')
+        text2 = text
+        msg2, r2, s2, p2, q2, g2, y2, x2, k2 = msg, r, s, p, q, g, y, x, k
 
-    pk = schluessel_berechnung(message_bytes1, message_bytes2, s1, s2, q)
-    print(pk)
+    #
+    # faelschung erzeugen
+
+    pk = private_key_finder(msg1, msg2, s1, s2, p, q, g, r, y, k)
+    print(f'Private Key: {pk}')

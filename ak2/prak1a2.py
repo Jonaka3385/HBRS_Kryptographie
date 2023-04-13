@@ -1,6 +1,5 @@
 from random import randrange
 from hashlib import sha256
-from math import ceil, sqrt
 from gmpy2 import xmpz, to_binary, invert, powmod, is_prime
 # gmpy2 für bessere Performance.
 # z.B. xmpz = schnellerer, größerer int
@@ -130,15 +129,35 @@ def verify(msg, r, s, p, q, g, y):
 
 
 def private_key_finder(msg1, msg2, s1, s2, p, q, g, r, y, k):
-    hash_obj = sha256(msg1)
-    h1 = int.from_bytes(hash_obj.digest(), byteorder='big')
-    hash_obj = sha256(msg2)
-    h2 = int.from_bytes(hash_obj.digest(), byteorder='big')
+    h1 = int(sha256(msg1).hexdigest(), 16)
+    h2 = int(sha256(msg2).hexdigest(), 16)
 
-    ds = s1 - s2
-    dh = invert(h1 - h2, q)
-    kx = ds * invert(dh, q) % q
-    x = (s1 * kx - h1) * invert(kx, q) % q
+    # s = (invert(k, q) * (m + x * r)) % q
+    # umkehrung für x=:
+    # s = (invert(k, q) * (m + x * r)) - unb*q
+    # s + unb*q = invert(k, q) * (m + x*r)
+    # (s + unb*q) / invert(k, q) = m + x*r
+    # ((s + unb * q) / invert(k, q)) - m = x*r
+    # (((s + unb * q) / invert(k, q)) - m) / r = x
+
+    m = h1
+    s = s1
+    unb = 0
+    while True:
+        raw_s = s + unb*q
+        x = ((raw_s / invert(k, q)) - m) / r
+        try:
+            s1t = (invert(k, q) * (h1 + x * r)) % q
+            s2t = (invert(k, q) * (h2 + x * r)) % q
+            if xmpz(s1t) == s1 & xmpz(s2t) == s2:
+                return x
+            unb += 1
+            if unb > 1000000:
+                return 0
+        except ZeroDivisionError:
+            pass
+
+    #
 
     print(f'Privater Schlüssel: {x}')
     return x

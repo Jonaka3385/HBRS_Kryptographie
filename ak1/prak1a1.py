@@ -89,7 +89,7 @@ def manual_decryption(klartext, mapping, chiffrat, freq):
     return klartext, mapping
 
 
-def start():
+if __name__ == "__main__":
     path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat1.txt"
     with open(path, "r") as f:
         chiffrat = f.read()

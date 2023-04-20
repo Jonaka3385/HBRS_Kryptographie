@@ -158,7 +158,7 @@ def encryptwithkey(text, key):
     return encrypted, key
 
 
-def start():
+if __name__ == "__main__":
     path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2.txt"
     with open(path, "r") as f:
         chiffrat = f.read()

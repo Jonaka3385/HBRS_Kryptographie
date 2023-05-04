@@ -40,8 +40,8 @@ def find_distances(trigram_indices):
     return distances
 
 
-def kasiskitest(chiffrat):
-    trigrams = find_trigrams(chiffrat)
+def kasiskitest(kasiskitest_chiffrat):
+    trigrams = find_trigrams(kasiskitest_chiffrat)
 
     sorted_trigrams = sorted(trigrams.items(), key=lambda x: len(x[1]), reverse=True)
 
@@ -99,17 +99,17 @@ def haeufigkeit(letters):
 
 
 def haeufigkeitsanalyse(letters, a, gcd):
-    key = ""
+    haeufigkeitsanalyse_key = ""
     for x in range(gcd):
         x_letters = ""
         for y in range(a-1):  # a-1 falls letztes Pattern unvollstädig
             x_letters += letters[y][x]
-        key += haeufigkeit(x_letters)
-    return key
+        haeufigkeitsanalyse_key += haeufigkeit(x_letters)
+    return haeufigkeitsanalyse_key
 
 
-def keyfinder(chiffrat, gcd):
-    split_chiffrat = [chiffrat[i:i + gcd] for i in range(0, len(chiffrat), gcd)]
+def keyfinder(keyfinder_chiffrat, gcd):
+    split_chiffrat = [keyfinder_chiffrat[i:i + gcd] for i in range(0, len(keyfinder_chiffrat), gcd)]
     a = len(split_chiffrat)
     letters = [[None for _ in range(gcd)] for _ in range(a)]
     i = 0
@@ -119,49 +119,51 @@ def keyfinder(chiffrat, gcd):
             letters[i][j] = letter
             j += 1
         i += 1
-    key = haeufigkeitsanalyse(letters, a, gcd)
-    return key
+    keyfinder_key = haeufigkeitsanalyse(letters, a, gcd)
+    return keyfinder_key
 
 
-def decrypt(chiffrat):
-    gcd = kasiskitest(chiffrat)
-    key = keyfinder(chiffrat, gcd)
-    klartext, key = decryptwithkey(chiffrat, key)
-    return klartext, key
+def decrypt(decrypt_chiffrat):
+    gcd = kasiskitest(decrypt_chiffrat)
+    decrypt_key = keyfinder(decrypt_chiffrat, gcd)
+    decrypt_klartext, decrypt_key = decryptwithkey(decrypt_chiffrat, decrypt_key)
+    return decrypt_klartext, decrypt_key
 
 
-def decryptwithkey(chiffrat, key):
+def decryptwithkey(decryptwithkey_chiffrat, decryptwith_key):
     decrypted = ""
-    split_chiffrat = [chiffrat[i:i + len(key)] for i in range(0, len(chiffrat), len(key))]
+    split_chiffrat = \
+        [decryptwithkey_chiffrat[i:i + len(decryptwith_key)] for i in range(0, len(decryptwithkey_chiffrat),
+                                                                            len(decryptwith_key))]
 
     for each_split in split_chiffrat:
         i = 0
         for letter in each_split:
-            number = (letter_to_index[letter] - letter_to_index[key[i]]) % len(alphabet)
+            number = (letter_to_index[letter] - letter_to_index[decryptwith_key[i]]) % len(alphabet)
             decrypted += index_to_letter[number]
             i += 1
 
-    return decrypted, key
+    return decrypted, decryptwith_key
 
 
-def encryptwithkey(text, key):
+def encryptwithkey(text, encryptwith_key):
     encrypted = ""
-    split_chiffrat = [text[i:i + len(key)] for i in range(0, len(text), len(key))]
+    split_chiffrat = [text[i:i + len(encryptwith_key)] for i in range(0, len(text), len(encryptwith_key))]
 
     for each_split in split_chiffrat:
         i = 0
         for letter in each_split:
-            number = (letter_to_index[letter] + letter_to_index[key[i]]) % len(alphabet)
+            number = (letter_to_index[letter] + letter_to_index[encryptwith_key[i]]) % len(alphabet)
             encrypted += index_to_letter[number]
             i += 1
 
-    return encrypted, key
+    return encrypted, encryptwith_key
 
 
 if __name__ == "__main__":
     path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2.txt"
-    with open(path, "r") as f:
-        chiffrat = f.read()
+    with open(path, "r") as file:
+        chiffrat = file.read()
     chiffrat = chiffrat.lower()
     klartext, key = decrypt(chiffrat)
     klartext = klartext.upper()
@@ -184,16 +186,16 @@ if __name__ == "__main__":
 
 
 def quickstart():
-    path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2.txt"
-    with open(path, "r") as f:
-        chiffrat = f.read()
-    chiffrat = chiffrat.lower()
-    key = "fwqgczxugp"
-    klartext, key = decryptwithkey(chiffrat, key)
-    klartext = klartext.upper()
+    quickstart_path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2.txt"
+    with open(quickstart_path, "r") as quickstart_file:
+        quickstart_chiffrat = quickstart_file.read()
+    quickstart_chiffrat = quickstart_chiffrat.lower()
+    quickstart_key = "fwqgczxugp"
+    quickstart_klartext, quickstart_key = decryptwithkey(quickstart_chiffrat, quickstart_key)
+    quickstart_klartext = quickstart_klartext.upper()
     print("Klartext: ")
-    print(klartext)
+    print(quickstart_klartext)
     print()
     print("Schlüssel: ")
-    print(key)
+    print(quickstart_key)
     print()

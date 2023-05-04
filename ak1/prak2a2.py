@@ -13,12 +13,12 @@ def same_length(a, length):
         # der String hat bereits die gewünschte Länge
         copied_string = a
 
-    return copied_string # Ausgabe: 'ABC    '
+    return copied_string  # Ausgabe: 'ABC    '
 
 
-def is_ascii_bytes(c):
+def is_ascii_bytes(bytes_array):
     try:
-        p = c.decode('ascii')
+        bytes_array.decode('ascii')
         return True
     except UnicodeDecodeError:
         return False
@@ -65,12 +65,12 @@ def decrypt(cipher0, cipher1, cipher2):
                         p2[t] = cipher2[t] ^ key[t]
                     if is_valid(p2.decode('ascii')):
                         print(f"p0: {p0},\n"
-                                f"p0 decoded: {p0.decode('ascii')},\n\n"
-                                f"p1: {p1},\n"
-                                f"p1 decoded: {p1.decode('ascii')},\n\n"
-                                f"p2: {p2},\n"
-                                f"p2 decoded: {p2.decode('ascii')},\n\n"
-                                f"key: {key}\n\n\n")
+                              f"p0 decoded: {p0.decode('ascii')},\n\n"
+                              f"p1: {p1},\n"
+                              f"p1 decoded: {p1.decode('ascii')},\n\n"
+                              f"p2: {p2},\n"
+                              f"p2 decoded: {p2.decode('ascii')},\n\n"
+                              f"key: {key}\n\n\n")
         key_length += 1
     print("Keine Ahnung")
 

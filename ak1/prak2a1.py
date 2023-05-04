@@ -1,6 +1,6 @@
 def is_ascii_bytes(bytes_array):
     try:
-        decoded = bytes_array.decode('ascii')
+        bytes_array.decode('ascii')
         return True
     except UnicodeDecodeError:
         return False

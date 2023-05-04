@@ -30,32 +30,32 @@ def calculate_freq(text):
 def decrypt(text, freq):
     sorted_freq = sorted(freq.items(), key=lambda x: x[1], reverse=True)
     sorted_eng_freq = sorted(eng_freq.items(), key=lambda x: x[1], reverse=True)
-    mapping = {}
+    decrypt_mapping = {}
     for i in range(len(sorted_freq)):
-        mapping[sorted_freq[i][0]] = sorted_eng_freq[i][0]
+        decrypt_mapping[sorted_freq[i][0]] = sorted_eng_freq[i][0]
     result = ""
     for char in text:
-        if char in mapping:
-            result += mapping[char]
+        if char in decrypt_mapping:
+            result += decrypt_mapping[char]
         else:
             result += char
-    return result, mapping
+    return result, decrypt_mapping
 
 
 def redecrypt(text, sorted_new_eng_freq, sorted_freq):
-    mapping = {}
+    redecrypt_mapping = {}
     for i in range(len(sorted_freq)):
-        mapping[sorted_freq[i][0]] = sorted_new_eng_freq[i][0]
+        redecrypt_mapping[sorted_freq[i][0]] = sorted_new_eng_freq[i][0]
     result = ""
     for char in text:
-        if char in mapping:
-            result += mapping[char]
+        if char in redecrypt_mapping:
+            result += redecrypt_mapping[char]
         else:
             result += char
-    return result, mapping
+    return result, redecrypt_mapping
 
 
-def manual_decryption(klartext, mapping, chiffrat, freq):
+def manual_decryption(manual_decrypt_klartext, manual_decrypt_mapping, manual_decrypt_chiffrat, freq):
     sorted_freq = sorted(freq.items(), key=lambda x: x[1], reverse=True)
     sorted_new_eng_freq = sorted(eng_freq.items(), key=lambda x: x[1], reverse=True)
 
@@ -64,7 +64,7 @@ def manual_decryption(klartext, mapping, chiffrat, freq):
         char1 = input("Erster Buchstabe: ")
         char2 = input("Zweiter Buchstabe: ")
 
-        if char1 not in mapping or char2 not in mapping:
+        if char1 not in manual_decrypt_mapping or char2 not in manual_decrypt_mapping:
             print("Mindestens einer der Buchstaben kommt nicht im Schlüssel vor.")
         elif char1 == char2:
             print("Die Buchstaben sind identisch.")
@@ -75,24 +75,25 @@ def manual_decryption(klartext, mapping, chiffrat, freq):
             while sorted_new_eng_freq[j][0] != char2:
                 j = j+1
             sorted_new_eng_freq[i], sorted_new_eng_freq[j] = sorted_new_eng_freq[j], sorted_new_eng_freq[i]
-            klartext, mapping = redecrypt(chiffrat, sorted_new_eng_freq, sorted_freq)
+            manual_decrypt_klartext, manual_decrypt_mapping = \
+                redecrypt(manual_decrypt_chiffrat, sorted_new_eng_freq, sorted_freq)
             print("Neuer Klartext:")
-            print(klartext)
+            print(manual_decrypt_klartext)
             print()
             print("Neuer Schlüssel(Mapping):")
-            print(mapping)
+            print(manual_decrypt_mapping)
             print()
 
         if input("Jetzt korrekt? (j/n): ") == "j":
             break
 
-    return klartext, mapping
+    return manual_decrypt_klartext, manual_decrypt_mapping
 
 
 if __name__ == "__main__":
     path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat1.txt"
-    with open(path, "r") as f:
-        chiffrat = f.read()
+    with open(path, "r") as file:
+        chiffrat = file.read()
     print("Chiffrat: ")
     print(chiffrat)
     print()
@@ -120,22 +121,22 @@ if __name__ == "__main__":
         print(mapping)
 
 
-def quickdecrypt(chiffrat, mapping):
+def quickdecrypt(quickdecrypt_chiffrat, quickdecrypt_mapping):
     result = ""
-    for char in chiffrat:
-        if char in mapping:
-            result += mapping[char]
+    for char in quickdecrypt_chiffrat:
+        if char in quickdecrypt_mapping:
+            result += quickdecrypt_mapping[char]
         else:
             result += char
     return result
 
 
 def quickstart():
-    path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat1.txt"
-    with open(path, "r") as f:
-        chiffrat = f.read()
+    quickstart_path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat1.txt"
+    with open(quickstart_path, "r") as quickstart_file:
+        quickstart_chiffrat = quickstart_file.read()
     print("Chiffrat: ")
-    print(quickdecrypt(chiffrat, right_mapping))
+    print(quickdecrypt(quickstart_chiffrat, right_mapping))
     print()
     print("Schlüssel(Mapping): ")
     print(right_mapping)

@@ -21,10 +21,8 @@ def next_key(nextkey, lb=65, ub=90):
     return nextkey
 
 
-def brute_force_decrypt(brute_ciphertext, brute_key=b'TZFHO'):
-    # counter = 7000000
-    brute_key = b'TQQPEAAA'
-    counter = 100000000
+def brute_force_decrypt(brute_ciphertext, brute_key=b'A'):
+    counter = 0
     brute_key = bytearray(brute_key)
     while True:
         print(f'Key: {brute_key}, Versuch: {counter}')

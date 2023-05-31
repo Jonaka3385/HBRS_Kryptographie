@@ -43,20 +43,20 @@ def generate_p_q(gen_pq_l, gen_pq_n):
             j += gen_pq_n2 + 1
 
 
-def generate_g(generate_g_p, generate_g_q):
+def generate_alpha(generatealpha_p, generatealpha_q):
     while True:
-        generate_g_h = randrange(2, generate_g_p - 1)
-        generate_g_exp = (generate_g_p - 1) // generate_g_q
-        generated_g = powmod(generate_g_h, generate_g_exp, generate_g_p)
-        if generated_g > 1:
+        generatealpha_h = randrange(2, generatealpha_p - 1)
+        generatealpha_exp = (generatealpha_p - 1) // generatealpha_q
+        generated_alpha = powmod(generatealpha_h, generatealpha_exp, generatealpha_p)
+        if generated_alpha > 1:
             break
-    return generated_g
+    return generated_alpha
 
 
 def generate_params(generate_params_key_length, generate_params_n):
     generated_param_p, generated_param_q = generate_p_q(generate_params_key_length, generate_params_n)
-    generated_param_g = generate_g(generated_param_p, generated_param_q)
-    return generated_param_p, generated_param_q, generated_param_g
+    generated_param_alpha = generate_alpha(generated_param_p, generated_param_q)
+    return generated_param_p, generated_param_q, generated_param_alpha
 
 
 def generate_keys(generate_keys_g, generate_keys_p, generate_keys_q):
@@ -65,75 +65,75 @@ def generate_keys(generate_keys_g, generate_keys_p, generate_keys_q):
     return generated_x, generated_y
 
 
-def validate_params(validate_params_p, validate_params_q, validate_params_g):
+def validate_params(validate_params_p, validate_params_q, validate_params_alpha):
     if is_prime(validate_params_p) and is_prime(validate_params_q):
-        if powmod(validate_params_g, validate_params_q, validate_params_p) == 1 and validate_params_g > 1 and \
+        if powmod(validate_params_alpha, validate_params_q, validate_params_p) == 1 and validate_params_alpha > 1 and \
                 ((validate_params_p - 1) % validate_params_q) == 0:
             return True
     return False
 
 
-def validate_sign(validate_sign_r, validate_sign_r_s, validate_sign_q):
-    if 0 > validate_sign_r > validate_sign_q:
+def validate_sign(validatesign_gamma, validatesign_delta, validatesign_q):
+    if 0 > validatesign_gamma > validatesign_q:
         return False
-    if 0 > validate_sign_r_s > validate_sign_q:
+    if 0 > validatesign_delta > validatesign_q:
         return False
     return True
 
 
-def sign(sign_msg, sign_p, sign_q, sign_g, sign_x):
-    if not validate_params(sign_p, sign_q, sign_g):
+def sign(sign_msg, sign_p, sign_q, sign_alpha, sign_privkey):
+    if not validate_params(sign_p, sign_q, sign_alpha):
         raise Exception('Invalid params')
     while True:
         sign_k = randrange(2, sign_q)  # k < q
-        sign_r = powmod(sign_g, sign_k, sign_p) % sign_q
+        sign_gamma = powmod(sign_alpha, sign_k, sign_p) % sign_q
         sign_m = int(sha256(sign_msg).hexdigest(), 16)
         try:
-            sign_s = (invert(sign_k, sign_q) * (sign_m + sign_x * sign_r)) % sign_q
-            return sign_r, sign_s, sign_k
+            sign_delta = (invert(sign_k, sign_q) * (sign_m + sign_privkey * sign_gamma)) % sign_q
+            return sign_gamma, sign_delta, sign_k
         except ZeroDivisionError:
             pass
 
 
-def sign_with_k(sign_w_k_msg, sign_w_k_p, sign_w_k_q, sign_w_k_g, sign_w_k_x, sign_w_k_k):
-    if not validate_params(sign_w_k_p, sign_w_k_q, sign_w_k_g):
+def sign_with_k(signwk_msg, signwk_p, signwk_q, signwk_alpha, signwk_a, signwk_k):
+    if not validate_params(signwk_p, signwk_q, signwk_alpha):
         raise Exception('Invalid params')
     while True:
-        sign_w_k_r = powmod(sign_w_k_g, sign_w_k_k, sign_w_k_p) % sign_w_k_q
-        sign_w_k_m = int(sha256(sign_w_k_msg).hexdigest(), 16)
+        signwk_r = powmod(signwk_alpha, signwk_k, signwk_p) % signwk_q
+        signwk_m = int(sha256(signwk_msg).hexdigest(), 16)
         try:
-            sign_w_k_delta = (invert(sign_w_k_k, sign_w_k_q) * (sign_w_k_m + sign_w_k_x * sign_w_k_r)) % sign_w_k_q
-            return sign_w_k_r, sign_w_k_delta, sign_w_k_k
+            signwk_delta = (invert(signwk_k, signwk_q) * (signwk_m + signwk_a * signwk_r)) % signwk_q
+            return signwk_r, signwk_delta, signwk_k
         except ZeroDivisionError:
             pass
 
 
-def verify(verify_msg, verify_r, verify_s, verify_p, verify_q, verify_g, verify_y):
-    if not validate_params(verify_p, verify_q, verify_g):
+def verify(verify_msg, verify_gamma, verify_delta, verify_p, verify_q, verify_alpha, verify_beta):
+    if not validate_params(verify_p, verify_q, verify_alpha):
         raise Exception('Invalid params')
-    if not validate_sign(verify_r, verify_s, verify_q):
+    if not validate_sign(verify_gamma, verify_delta, verify_q):
         return False
     try:
-        w = invert(verify_s, verify_q)
+        w = invert(verify_delta, verify_q)
     except ZeroDivisionError:
         return False
     m = int(sha256(verify_msg).hexdigest(), 16)
     u1 = (m * w) % verify_q
-    u2 = (verify_r * w) % verify_q
-    v = (powmod(verify_g, u1, verify_p) * powmod(verify_y, u2, verify_p)) % verify_p % verify_q
-    if v == verify_r:
+    u2 = (verify_gamma * w) % verify_q
+    v = (powmod(verify_alpha, u1, verify_p) * powmod(verify_beta, u2, verify_p)) % verify_p % verify_q
+    if v == verify_gamma:
         return True
     return False
 
 
-def private_key_finder(p_k_f_msg1, p_k_f_msg2, p_k_f_delta1, p_k_f_delta2, p_k_f_q, p_k_f_gamma):
-    h1 = int(sha256(p_k_f_msg1).hexdigest(), 16)
-    h2 = int(sha256(p_k_f_msg2).hexdigest(), 16)
+def private_key_finder(pkf_msg1, pkf_msg2, pkf_delta1, pkf_delta2, pkf_q, pkf_gamma):
+    pkf_h1 = int(sha256(pkf_msg1).hexdigest(), 16)
+    pkf_h2 = int(sha256(pkf_msg2).hexdigest(), 16)
 
-    p_k_f_delta1_inv = pow(p_k_f_delta1, -1, p_k_f_q)
-    p_k_f_delta2_inv = pow(p_k_f_delta2, -1, p_k_f_q)
-    x_calc = ((h1 * p_k_f_delta1_inv - h2 * p_k_f_delta2_inv) * pow(p_k_f_gamma, -1, p_k_f_q)
-              * pow((p_k_f_delta2_inv - p_k_f_delta1_inv), -1, p_k_f_q)) % p_k_f_q
+    pkf_delta1_inv = pow(pkf_delta1, -1, pkf_q)
+    pkf_delta2_inv = pow(pkf_delta2, -1, pkf_q)
+    x_calc = ((pkf_h1 * pkf_delta1_inv - pkf_h2 * pkf_delta2_inv) * pow(pkf_gamma, -1, pkf_q)
+              * pow((pkf_delta2_inv - pkf_delta1_inv), -1, pkf_q)) % pkf_q
 
     print(f'Privater Schlüssel: {x_calc}')
     return
@@ -143,52 +143,52 @@ if __name__ == '__main__':
     key_n = 256
     key_length = 3072
     p, q, alpha = generate_params(key_length, key_n)
-    x, y = generate_keys(alpha, p, q)
+    priv_key, beta = generate_keys(alpha, p, q)
 
     text = 'Hallo, Welt!'
     msg = str.encode(text, 'utf-8')
-    r, delta, k = sign(msg, p, q, alpha, x)
+    gamma, delta, k = sign(msg, p, q, alpha, priv_key)
     b = False
-    if verify(msg, r, delta, p, q, alpha, y):
+    if verify(msg, gamma, delta, p, q, alpha, beta):
         print(f'All ok')
         b = True
-    print(f'msg: {msg}, ', f'r: {r}, ', f'delta: {delta}, ', f'p: {p}, ', f'q: {q}, ',
-          f'g: {alpha}, ', f'y: {y}, ', f'x: {x}', sep='\n')
+    print(f'msg: {msg}', f'gamma: {gamma}', f'delta: {delta}', f'p: {p}', f'q: {q}', f'g: {alpha}', f'beta: {beta}',
+          f'priv_key: {priv_key}', sep='\n')
 
     if b:
         text1 = text
-        msg1, r1, delta1 = msg, r, delta
+        msg1, gamma1, delta1 = msg, gamma, delta
     else:
         print(f'Fehlerhafte Parameter')
         input(f'Trotzdem fortfahren?: ')
         text1 = text
-        msg1, r1, delta1 = msg, r, delta
+        msg1, gamma1, delta1 = msg, gamma, delta
 
     #
     # next Text
 
     text = 'Hallo, Menschen!'
     msg = str.encode(text, 'utf-8')
-    r, delta, k = sign_with_k(msg, p, q, alpha, x, k)
+    gamma, delta, k = sign_with_k(msg, p, q, alpha, priv_key, k)
     b = False
-    if verify(msg, r, delta, p, q, alpha, y):
+    if verify(msg, gamma, delta, p, q, alpha, beta):
         print(f'All ok')
         b = True
-    print(f'msg: {msg}, ', f'r: {r}, ', f's: {delta}, ', f'p: {p}, ', f'q: {q}, ',
-          f'g: {alpha}, ', f'y: {y}, ', f'x: {x}', sep='\n')
+    print(f'msg: {msg}', f'gamma: {gamma}', f'delta: {delta}', f'p: {p}', f'q: {q}', f'g: {alpha}', f'beta: {beta}',
+          f'priv_key: {priv_key}', sep='\n')
 
     if b:
         text2 = text
-        msg2, r2, delta2 = msg, r, delta
+        msg2, gamma2, delta2 = msg, gamma, delta
     else:
         print(f'Fehlerhafte Parameter')
         input(f'Trotzdem fortfahren?: ')
         text2 = text
-        msg2, r2, delta2 = msg, r, delta
+        msg2, gamma2, delta2 = msg, gamma, delta
 
     #
     # faelschung erzeugen
-    private_key_finder(msg1, msg2, delta1, delta2, q, r)
+    private_key_finder(msg1, msg2, delta1, delta2, q, gamma)
 
 # g = alpha
 # y = beta

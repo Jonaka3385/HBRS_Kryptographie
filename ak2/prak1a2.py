@@ -190,7 +190,6 @@ if __name__ == '__main__':
 
     #
     # faelschung erzeugen
-
     private_key_finder(msg1, msg2, delta1, delta2, q, r)
 
 # g = alpha

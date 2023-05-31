@@ -120,7 +120,7 @@ if __name__ == '__main__':
     key = generate_key_only(bit_size, exp)
     priv_key, pub_key = key_to_pem_string(key)
     # key_to_file(key, path_priv, path_pub)
-    print('Key: ')
+    print(f'Keys: ')
     print(priv_key)
     print()
     print(pub_key)
@@ -133,20 +133,18 @@ if __name__ == '__main__':
     n = key.public_key().public_numbers().n
     e = key.public_key().public_numbers().e
     d = key.private_numbers().d
-    print(f'{n}\n{e}\n{d}\n')
+    print(n, e, d, sep='\n')
+    print()
 
-    message = "Hallo, Welt!"
+    message = 'Hallo, Welt!'
     message_bytes = message.encode('utf-8')
     byte_menge = len(message_bytes)
     int_num = int.from_bytes(message_bytes, byteorder='big')
 
     signature = signatur(int_num, n, d)
-    print('Signature: \n', signature)
-    verifikatione = verifikation(signature, n, d)
-    print('Verifikation: \n', verifikatione)
+    verifikationn = verifikation(signature, n, d)
     faelschung = universelle_faelschung(int_num, n, e, d)
-    print('Faelschung: \n', faelschung)
-
-    print('Original unveraendert: ' + message)
-    print('Original encoded, decoded: ' + int_num.to_bytes(byte_menge, byteorder='big').decode('utf-8'))
-    print('Faelschung decoded: ' + faelschung.to_bytes(byte_menge, byteorder='big').decode('utf-8'))
+    print(f'Signature: \n{signature}', f'Verifikation: \n{verifikationn}', f'Faelschung: \n{faelschung}', '',
+          f'Original unveraendert: {message}',
+          f'Original encoded, decoded: {int_num.to_bytes(byte_menge, byteorder="big").decode("utf-8")}',
+          f'Faelschung decoded: {faelschung.to_bytes(byte_menge, byteorder="big").decode("utf-8")}', sep='\n')

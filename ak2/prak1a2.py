@@ -150,18 +150,17 @@ if __name__ == '__main__':
     r, delta, k = sign(msg, p, q, alpha, x)
     b = False
     if verify(msg, r, delta, p, q, alpha, y):
-        print('All ok')
+        print(f'All ok')
         b = True
-    print(f'msg: {msg}, ', f'r: {r}, ', f'delta: {delta}, ', f'p: {p}, ', f'q: {q}, ', f'g: {alpha}, ', f'y: {y}, ',
-          f'x: {x}',
-          sep='\n')
+    print(f'msg: {msg}, ', f'r: {r}, ', f'delta: {delta}, ', f'p: {p}, ', f'q: {q}, ',
+          f'g: {alpha}, ', f'y: {y}, ', f'x: {x}', sep='\n')
 
     if b:
         text1 = text
         msg1, r1, delta1 = msg, r, delta
     else:
-        print('Fehlerhafte Parameter')
-        input('Trotzdem fortfahren?: ')
+        print(f'Fehlerhafte Parameter')
+        input(f'Trotzdem fortfahren?: ')
         text1 = text
         msg1, r1, delta1 = msg, r, delta
 
@@ -173,18 +172,17 @@ if __name__ == '__main__':
     r, delta, k = sign_with_k(msg, p, q, alpha, x, k)
     b = False
     if verify(msg, r, delta, p, q, alpha, y):
-        print('All ok')
+        print(f'All ok')
         b = True
-    print(f'msg: {msg}, ', f'r: {r}, ', f's: {delta}, ', f'p: {p}, ', f'q: {q}, ', f'g: {alpha}, ', f'y: {y}, ',
-          f'x: {x}',
-          sep='\n')
+    print(f'msg: {msg}, ', f'r: {r}, ', f's: {delta}, ', f'p: {p}, ', f'q: {q}, ',
+          f'g: {alpha}, ', f'y: {y}, ', f'x: {x}', sep='\n')
 
     if b:
         text2 = text
         msg2, r2, delta2 = msg, r, delta
     else:
-        print('Fehlerhafte Parameter')
-        input('Trotzdem fortfahren?: ')
+        print(f'Fehlerhafte Parameter')
+        input(f'Trotzdem fortfahren?: ')
         text2 = text
         msg2, r2, delta2 = msg, r, delta
 

@@ -1,3 +1,6 @@
+import random
+
+
 def gcd(gcd_a, gcd_b):
     if gcd_b == 0:
         return gcd_a
@@ -11,7 +14,7 @@ def isPrime(number):
         return False
     if number < 9:
         return True
-    if n % 3 == 0:
+    if number % 3 == 0:
         return False
     border = int(number**0.5)
     tmp = 5
@@ -59,22 +62,34 @@ def qft(qft_n, qft_a):
     return qft_i-1
 
 
-if __name__ == '__main__':
-    n = 143
+def method():
+    p = random.randint(100, 200)
+    while not isPrime(p):
+        p = random.randint(100, 200)
+    q = random.randint(100, 200)
+    while not isPrime(q) and not p == q:
+        q = random.randint(100, 200)
+    n = p*q
+    print(f'p: {p}', f'q: {q}', f'n: {n}', '', sep='\n')
     a = 2
     r = qft(n, a)
-    print(r)
+    print(f'r: {r}', sep='\n')
     if r % 2 == 0:
         x = pow(2, int(r/2), n)
-        print(x)
+        print(f'x: {x}', '', sep='\n')
     else:
         x = 0
-    p = gcd(x-1, n)
-    q = gcd(x+1, n)
-    assert p * q == n
-    print(p)
-    print(q)
-    print()
+    p_tmp = gcd(x-1, n)
+    q_tmp = gcd(x+1, n)
+    print(f'p_tmp: {p_tmp}', f'q_tmp: {q_tmp}', sep='\n')
+    if not p_tmp * q_tmp == n:
+        return False
+    if not isPrime(p_tmp):
+        return False
+    if not isPrime(q_tmp):
+        return False
+    if (p_tmp == p or p_tmp == q) or (q_tmp == p or q_tmp == q):
+        print('Success?\n')
 
     euler_n, d, e = get_rsa_params(p, q)
     msg = 10
@@ -82,4 +97,16 @@ if __name__ == '__main__':
     new_msg = rsa_decrypt(cipher, d, n)
     print(f'p: {p}', f'q: {q}', f'n: {n}', f'euler_n: {euler_n}', f'd: {d}', f'e: {e}', sep='\n')
     print()
-    print(msg, cipher, new_msg, sep='\n')
+    crypt_worked = msg == new_msg
+    print(msg, cipher, new_msg, f'Crypt worked: {crypt_worked}', sep='\n')
+    return crypt_worked
+
+
+if __name__ == '__main__':
+    worked = 0
+    tries = 1000
+    for i in range(tries - 1):
+        if method():
+            worked += 1
+    worked_pro = worked / (tries/100)
+    print('\n\n', f'worked: {worked} out of {tries}', f'Prozent worked: {worked_pro}', sep='\n')

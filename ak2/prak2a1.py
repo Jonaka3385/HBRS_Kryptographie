@@ -101,9 +101,9 @@ def shor():
     new_msg = rsa_decrypt(cipher, d, n)
     print(f'p: {p}', f'q: {q}', f'n: {n}', f'euler_n: {euler_n}', f'd: {d}', f'e: {e}', sep='\n')
     print()
-    crypt_worked = msg == new_msg
-    print(msg, cipher, new_msg, f'Crypt worked: {crypt_worked}', sep='\n')
-    return True, crypt_worked
+    crypting_worked = msg == new_msg
+    print(msg, cipher, new_msg, f'Crypt worked: {crypting_worked}', sep='\n')
+    return True, crypting_worked
 
 
 if __name__ == '__main__':

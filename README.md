@@ -1,4 +1,4 @@
 # HBRS_Kryptographie
-# Praktikumsaufgaben aus Angewandte Kryptographie 1 und 2
-# Vollständig in Python (PyCharm mit python 3.10)
-# laufend
+Praktikumsaufgaben aus Angewandte Kryptographie 1 und 2, Sommersemester 2022-2024
+
+Praktikumsaufgaben von Prof. Lemke-Rust

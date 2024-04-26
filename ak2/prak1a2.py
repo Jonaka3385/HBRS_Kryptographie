@@ -153,14 +153,13 @@ def sign_with_k(p_msg, p_p, p_q, p_alpha, p_a, p_k):
     """
     if not validate_params(p_p, p_q, p_alpha):
         raise Exception('Invalid params')
-    while True:
-        r = powmod(p_alpha, p_k, p_p) % p_q
-        m = int(sha256(p_msg).hexdigest(), 16)
-        try:
-            delta = (invert(p_k, p_q) * (m + p_a * r)) % p_q
-            return r, delta, p_k
-        except ZeroDivisionError:
-            pass
+    r = powmod(p_alpha, p_k, p_p) % p_q
+    m = int(sha256(p_msg).hexdigest(), 16)
+    try:
+        delta = (invert(p_k, p_q) * (m + p_a * r)) % p_q
+        return r, delta, p_k
+    except ZeroDivisionError:
+        pass
 
 
 def verify(p_msg, p_gamma, p_delta, p_p, p_q, p_alpha, p_beta):

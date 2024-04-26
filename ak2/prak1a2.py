@@ -4,6 +4,12 @@ from gmpy2 import xmpz, to_binary, invert, powmod, is_prime
 
 
 def generate_p_q(gen_pq_l, gen_pq_n):
+    """
+
+    :param gen_pq_l: l
+    :param gen_pq_n: n
+    :return: p, q
+    """
     gen_pq_g = gen_pq_n  # g >= 160
     gen_pq_n2 = (gen_pq_l - 1) // gen_pq_g
     gen_pq_b = (gen_pq_l - 1) % gen_pq_g
@@ -44,6 +50,12 @@ def generate_p_q(gen_pq_l, gen_pq_n):
 
 
 def generate_alpha(generatealpha_p, generatealpha_q):
+    """
+
+    :param generatealpha_p: p
+    :param generatealpha_q: q
+    :return: alpha
+    """
     while True:
         generatealpha_h = randrange(2, generatealpha_p - 1)
         generatealpha_exp = (generatealpha_p - 1) // generatealpha_q
@@ -54,18 +66,38 @@ def generate_alpha(generatealpha_p, generatealpha_q):
 
 
 def generate_params(generate_params_key_length, generate_params_n):
+    """
+
+    :param generate_params_key_length: Schlüssellänge
+    :param generate_params_n: n
+    :return: p, q, alpha
+    """
     generated_param_p, generated_param_q = generate_p_q(generate_params_key_length, generate_params_n)
     generated_param_alpha = generate_alpha(generated_param_p, generated_param_q)
     return generated_param_p, generated_param_q, generated_param_alpha
 
 
 def generate_keys(generate_keys_g, generate_keys_p, generate_keys_q):
+    """
+
+    :param generate_keys_g: g
+    :param generate_keys_p: p
+    :param generate_keys_q: q
+    :return: x, y
+    """
     generated_x = randrange(2, generate_keys_q)  # x < q
     generated_y = powmod(generate_keys_g, generated_x, generate_keys_p)
     return generated_x, generated_y
 
 
 def validate_params(validate_params_p, validate_params_q, validate_params_alpha):
+    """
+
+    :param validate_params_p: p
+    :param validate_params_q: q
+    :param validate_params_alpha: alpha
+    :return: boolean-Ergebnis der validierung
+    """
     if is_prime(validate_params_p) and is_prime(validate_params_q):
         if powmod(validate_params_alpha, validate_params_q, validate_params_p) == 1 and validate_params_alpha > 1 and \
                 ((validate_params_p - 1) % validate_params_q) == 0:
@@ -74,6 +106,13 @@ def validate_params(validate_params_p, validate_params_q, validate_params_alpha)
 
 
 def validate_sign(validatesign_gamma, validatesign_delta, validatesign_q):
+    """
+
+    :param validatesign_gamma: gamma
+    :param validatesign_delta: delta
+    :param validatesign_q: q
+    :return: boolean-Ergebnis der validierung von der Signatur
+    """
     if 0 > validatesign_gamma > validatesign_q:
         return False
     if 0 > validatesign_delta > validatesign_q:
@@ -82,6 +121,15 @@ def validate_sign(validatesign_gamma, validatesign_delta, validatesign_q):
 
 
 def sign(sign_msg, sign_p, sign_q, sign_alpha, sign_privkey):
+    """
+
+    :param sign_msg: message to sign
+    :param sign_p: p
+    :param sign_q: q
+    :param sign_alpha: alpha
+    :param sign_privkey: private key
+    :return: gamma, delta, k
+    """
     if not validate_params(sign_p, sign_q, sign_alpha):
         raise Exception('Invalid params')
     while True:
@@ -96,6 +144,16 @@ def sign(sign_msg, sign_p, sign_q, sign_alpha, sign_privkey):
 
 
 def sign_with_k(signwk_msg, signwk_p, signwk_q, signwk_alpha, signwk_a, signwk_k):
+    """
+
+    :param signwk_msg: message to sign
+    :param signwk_p: p
+    :param signwk_q: q
+    :param signwk_alpha: alpha
+    :param signwk_a: a
+    :param signwk_k: k
+    :return: r, delta, k
+    """
     if not validate_params(signwk_p, signwk_q, signwk_alpha):
         raise Exception('Invalid params')
     while True:
@@ -109,6 +167,17 @@ def sign_with_k(signwk_msg, signwk_p, signwk_q, signwk_alpha, signwk_a, signwk_k
 
 
 def verify(verify_msg, verify_gamma, verify_delta, verify_p, verify_q, verify_alpha, verify_beta):
+    """
+
+    :param verify_msg: message to verify
+    :param verify_gamma: gamma
+    :param verify_delta: delta
+    :param verify_p: p
+    :param verify_q: q
+    :param verify_alpha: alpha
+    :param verify_beta: beta
+    :return: boolean-Ergebnis vom Verifizieren
+    """
     if not validate_params(verify_p, verify_q, verify_alpha):
         raise Exception('Invalid params')
     if not validate_sign(verify_gamma, verify_delta, verify_q):
@@ -127,6 +196,16 @@ def verify(verify_msg, verify_gamma, verify_delta, verify_p, verify_q, verify_al
 
 
 def private_key_finder(pkf_msg1, pkf_msg2, pkf_delta1, pkf_delta2, pkf_q, pkf_gamma):
+    """
+
+    :param pkf_msg1: erste message
+    :param pkf_msg2: zweite message
+    :param pkf_delta1: delta der ersten message
+    :param pkf_delta2: delta der zweiten message
+    :param pkf_q: q
+    :param pkf_gamma: gamma
+    :return: nothing (private key will be printed in console)
+    """
     pkf_h1 = int(sha256(pkf_msg1).hexdigest(), 16)
     pkf_h2 = int(sha256(pkf_msg2).hexdigest(), 16)
 
@@ -146,7 +225,7 @@ if __name__ == '__main__':
     priv_key, beta = generate_keys(alpha, p, q)
 
     text = 'Hallo, Welt!'
-    msg = str.encode(text, 'utf-8')
+    msg = str.encode(text)
     gamma, delta, k = sign(msg, p, q, alpha, priv_key)
     b = False
     if verify(msg, gamma, delta, p, q, alpha, beta):
@@ -168,7 +247,7 @@ if __name__ == '__main__':
     # next Text
 
     text = 'Hallo, Menschen!'
-    msg = str.encode(text, 'utf-8')
+    msg = str.encode(text)
     gamma, delta, k = sign_with_k(msg, p, q, alpha, priv_key, k)
     b = False
     if verify(msg, gamma, delta, p, q, alpha, beta):
@@ -189,13 +268,3 @@ if __name__ == '__main__':
     #
     # faelschung erzeugen
     private_key_finder(msg1, msg2, delta1, delta2, q, gamma)
-
-# g = alpha
-# y = beta
-# x = a
-# p = p
-# q = q
-# public key = p,q,g,y
-# private key = x
-# r = gamma
-# s = delta

@@ -12,7 +12,7 @@ def generate_key(gk_bit_size, gk_public_exponent):
         backend=default_backend()
     )
 
-    # privater Schlüssel PEM-kodiert als String
+    # privater Schlüssel PEM-codiert als String
     gk_private_key_pem = gk_private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.PKCS8,
@@ -142,9 +142,9 @@ if __name__ == '__main__':
     int_num = int.from_bytes(message_bytes, byteorder='big')
 
     signature = signatur(int_num, n, d)
-    verifikationn = verifikation(signature, n, d)
+    verifikation = verifikation(signature, n, d)
     faelschung = universelle_faelschung(int_num, n, e, d)
-    print(f'Signature: \n{signature}', f'Verifikation: \n{verifikationn}', f'Faelschung: \n{faelschung}', '',
+    print(f'Signature: \n{signature}', f'Verifikation: \n{verifikation}', f'Faelschung: \n{faelschung}', '',
           f'Original unveraendert: {message}',
           f'Original encoded, decoded: {int_num.to_bytes(byte_menge, byteorder="big").decode("utf-8")}',
           f'Faelschung decoded: {faelschung.to_bytes(byte_menge, byteorder="big").decode("utf-8")}', sep='\n')

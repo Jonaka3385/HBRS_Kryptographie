@@ -1,3 +1,7 @@
+"""
+Praktikum 1 Aufgabe 1
+p_ = Übergebener Parameter
+"""
 import random
 
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -5,111 +9,155 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 
 
-def generate_key(gk_bit_size, gk_public_exponent):
-    gk_private_key = rsa.generate_private_key(
-        public_exponent=gk_public_exponent,
-        key_size=gk_bit_size,
+def generate_key(p_bit_size, p_pub_exp):
+    """
+    :param p_bit_size:
+    :param p_pub_exp:
+    :return: private and public key (pem encoded)
+    """
+    priv_key = rsa.generate_private_key(
+        public_exponent=p_pub_exp,
+        key_size=p_bit_size,
         backend=default_backend()
     )
 
     # privater Schlüssel PEM-codiert als String
-    gk_private_key_pem = gk_private_key.private_bytes(
+    priv_key_pem = priv_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.NoEncryption()
     ).decode()
 
     # öffentlicher Schlüssel PEM-kodiert als String
-    gk_public_key_pem = gk_private_key.public_key().public_bytes(
+    pub_key_pem = priv_key.public_key().public_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo
     ).decode()
 
-    gk_path_priv = '/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak2/prak1Files/priv_key.pem'
-    gk_path_pub = '/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak2/prak1Files/pub_key.pem'
+    path_priv = '/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak2/prak1Files/priv_key.pem'
+    path_pub = '/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak2/prak1Files/pub_key.pem'
     # privaten Schlüssel als PEM-Datei schreiben
-    with open(gk_path_priv, 'wb') as gk_f:
-        gk_f.write(gk_private_key.private_bytes(
+    with open(path_priv, 'wb') as f:
+        f.write(priv_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=serialization.NoEncryption()
         ))
 
     # öffentlichen Schlüssel als PEM-Datei schreiben
-    with open(gk_path_pub, 'wb') as gk_f:
-        gk_f.write(gk_private_key.public_key().public_bytes(
+    with open(path_pub, 'wb') as f:
+        f.write(priv_key.public_key().public_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PublicFormat.SubjectPublicKeyInfo
         ))
 
-    return gk_private_key_pem, gk_public_key_pem
+    return priv_key_pem, pub_key_pem
 
 
-def generate_key_only(gko_bit_size, gko_public_exponent):
+def generate_key_only(p_bit_size, p_pub_exp):
+    """
+    :param p_bit_size:
+    :param p_pub_exp:
+    :return: rsa private key
+    """
     return rsa.generate_private_key(
-        public_exponent=gko_public_exponent,
-        key_size=gko_bit_size,
+        public_exponent=p_pub_exp,
+        key_size=p_bit_size,
         backend=default_backend()
     )
 
 
-def key_to_pem_string(ktps_key):
+def key_to_pem_string(p_key):
+    """
+    :param p_key:
+    :return: private and public key (pem encoded)
+    """
     # privater Schlüssel PEM-kodiert als String
-    ktps_private_key_pem = ktps_key.private_bytes(
+    priv_key_pem = p_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.NoEncryption()
     ).decode()
 
     # öffentlicher Schlüssel PEM-kodiert als String
-    ktps_public_key_pem = ktps_key.public_key().public_bytes(
+    pub_key_pem = p_key.public_key().public_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo
     ).decode()
-    return ktps_private_key_pem, ktps_public_key_pem
+    return priv_key_pem, pub_key_pem
 
 
-def key_to_file(ktf_key, ktf_path_priv, ktf_path_pub):
+def key_to_file(p_key, p_path_priv, p_path_pub):
+    """
+    :param p_key:
+    :param p_path_priv:
+    :param p_path_pub:
+    """
     # privaten Schlüssel als PEM-Datei schreiben
-    with open(ktf_path_priv, 'wb') as ktf_f:
-        ktf_f.write(ktf_key.private_bytes(
+    with open(p_path_priv, 'wb') as f:
+        f.write(p_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=serialization.NoEncryption()
         ))
 
     # öffentlichen Schlüssel als PEM-Datei schreiben
-    with open(ktf_path_pub, 'wb') as ktf_f:
-        ktf_f.write(ktf_key.public_key().public_bytes(
+    with open(p_path_pub, 'wb') as f:
+        f.write(p_key.public_key().public_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PublicFormat.SubjectPublicKeyInfo
         ))
 
 
-def fast_modular_exponentation(fme_a, fme_b, fme_n):
-    fme_result = 1
-    while fme_b > 0:
-        if fme_b % 2:
-            fme_result = (fme_result * fme_a) % fme_n
-        fme_a = (fme_a * fme_a) % fme_n
-        fme_b //= 2
-    return fme_result
+def fast_modular_exponentation(p_a, p_b, p_n):
+    """
+    :param p_a:
+    :param p_b:
+    :param p_n:
+    :return: Ergebnis der fast modular exponentation
+    """
+    result = 1
+    while p_b > 0:
+        if p_b % 2:
+            result = (result * p_a) % p_n
+        p_a = (p_a * p_a) % p_n
+        p_b //= 2
+    return result
 
 
-def signatur(signatur_message, signatur_n, signatur_d):
-    return fast_modular_exponentation(signatur_message, signatur_d, signatur_n)
+def signatur(p_msg, p_n, p_d):
+    """
+    :param p_msg:
+    :param p_n:
+    :param p_d:
+    :return: fme_result
+    """
+    return fast_modular_exponentation(p_msg, p_d, p_n)
 
 
-def verifikation(verifikation_signature, verifikation_n, verifikation_d):
-    return fast_modular_exponentation(verifikation_signature, verifikation_d, verifikation_n)
+def verifikation(p_signature, p_n, p_d):
+    """
+    :param p_signature:
+    :param p_n:
+    :param p_d:
+    :return: fme_result
+    """
+    return fast_modular_exponentation(p_signature, p_d, p_n)
 
 
-def universelle_faelschung(uf_message, uf_n, uf_e, uf_d):
-    uf_r = random.getrandbits(3000)
-    uf_s_strich = uf_r * fast_modular_exponentation(uf_message, uf_d, uf_n)
-    uf_s = pow(uf_r, -1, uf_n) * uf_s_strich % uf_n
-    uf_m = fast_modular_exponentation(uf_s, uf_e, uf_n)
-    return uf_m
+def universelle_faelschung(p_msg, p_n, p_e, p_d):
+    """
+    :param p_msg:
+    :param p_n:
+    :param p_e:
+    :param p_d:
+    :return: m
+    """
+    r = random.getrandbits(3000)
+    s_strich = r * fast_modular_exponentation(p_msg, p_d, p_n)
+    s = pow(r, -1, p_n) * s_strich % p_n
+    m = fast_modular_exponentation(s, p_e, p_n)
+    return m
 
 
 if __name__ == '__main__':
@@ -137,14 +185,14 @@ if __name__ == '__main__':
     print()
 
     message = 'Hallo, Welt!'
-    message_bytes = message.encode('utf-8')
+    message_bytes = message.encode()
     byte_menge = len(message_bytes)
-    int_num = int.from_bytes(message_bytes, byteorder='big')
+    int_num = int.from_bytes(message_bytes)
 
     signature = signatur(int_num, n, d)
     verifikation = verifikation(signature, n, d)
     faelschung = universelle_faelschung(int_num, n, e, d)
     print(f'Signature: \n{signature}', f'Verifikation: \n{verifikation}', f'Faelschung: \n{faelschung}', '',
           f'Original unveraendert: {message}',
-          f'Original encoded, decoded: {int_num.to_bytes(byte_menge, byteorder="big").decode("utf-8")}',
-          f'Faelschung decoded: {faelschung.to_bytes(byte_menge, byteorder="big").decode("utf-8")}', sep='\n')
+          f'Original encoded, decoded: {int_num.to_bytes(byte_menge).decode()}',
+          f'Faelschung decoded: {faelschung.to_bytes(byte_menge).decode()}', sep='\n')

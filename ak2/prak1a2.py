@@ -4,6 +4,7 @@ p_ = Übergebener Parameter
 """
 from random import randrange
 from hashlib import sha256
+# gmpy2 xmpz, mpz = different txpe of numeric values (xmpz is mutable, mpz not)
 from gmpy2 import xmpz, to_binary, invert, powmod, is_prime
 
 

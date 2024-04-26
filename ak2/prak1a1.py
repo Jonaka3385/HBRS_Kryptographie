@@ -187,12 +187,12 @@ if __name__ == '__main__':
     message = 'Hallo, Welt!'
     message_bytes = message.encode()
     byte_menge = len(message_bytes)
-    int_num = int.from_bytes(message_bytes)
+    int_num = int.from_bytes(message_bytes, "big")
 
     signature = signatur(int_num, n, d)
     verifikation = verifikation(signature, n, d)
     faelschung = universelle_faelschung(int_num, n, e, d)
     print(f'Signature: \n{signature}', f'Verifikation: \n{verifikation}', f'Faelschung: \n{faelschung}', '',
           f'Original unveraendert: {message}',
-          f'Original encoded, decoded: {int_num.to_bytes(byte_menge).decode()}',
-          f'Faelschung decoded: {faelschung.to_bytes(byte_menge).decode()}', sep='\n')
+          f'Original encoded, decoded: {int_num.to_bytes(byte_menge, "big").decode()}',
+          f'Faelschung decoded: {faelschung.to_bytes(byte_menge, "big").decode()}', sep='\n')

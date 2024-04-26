@@ -1,14 +1,24 @@
+"""
+Praktikum 1 Aufgabe 2
+p_ = Übergebener Parameter
+"""
 import math
+import string
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 letter_to_index = dict(zip(alphabet, range(len(alphabet))))
 index_to_letter = dict(zip(range(len(alphabet)), alphabet))
 
 
-def relhaeufigkeit(text):
+def relhaeufigkeit(p_text):
+    """
+
+    :param p_text:
+    :return:
+    """
     letter_count = {char: 0 for char in alphabet}
 
-    for char in text:
+    for char in p_text:
         if char.isalpha():
             letter_count[char] += 1
 
@@ -17,14 +27,19 @@ def relhaeufigkeit(text):
     tmp = {}
     for char, count in letter_count.items():
         frequency = count / total_letters
-        tmp = tmp + (char.upper(), ": ", frequency)
+        tmp += char.upper(), ": ", frequency
     return tmp
 
 
-def find_trigrams(text):
+def find_trigrams(p_text):
+    """
+
+    :param p_text:
+    :return:
+    """
     trigrams = {}
-    for i in range(len(text)-2):
-        trigram = text[i:i+3]
+    for i in range(len(p_text) - 2):
+        trigram = p_text[i:i + 3]
         if trigram in trigrams:
             trigrams[trigram].append(i)
         else:
@@ -32,16 +47,26 @@ def find_trigrams(text):
     return trigrams
 
 
-def find_distances(trigram_indices):
+def find_distances(p_trigram_indices):
+    """
+
+    :param p_trigram_indices:
+    :return:
+    """
     distances = []
-    for i in range(len(trigram_indices)-1):
-        distance = trigram_indices[i+1] - trigram_indices[i]
+    for i in range(len(p_trigram_indices) - 1):
+        distance = p_trigram_indices[i + 1] - p_trigram_indices[i]
         distances.append(distance)
     return distances
 
 
-def kasiskitest(kasiskitest_chiffrat):
-    trigrams = find_trigrams(kasiskitest_chiffrat)
+def kasiskitest(p_chiffrat):
+    """
+
+    :param p_chiffrat:
+    :return:
+    """
+    trigrams = find_trigrams(p_chiffrat)
 
     sorted_trigrams = sorted(trigrams.items(), key=lambda x: len(x[1]), reverse=True)
 
@@ -54,10 +79,15 @@ def kasiskitest(kasiskitest_chiffrat):
     return gcd
 
 
-def calculate_coincidence_index(text):
+def calculate_coincidence_index(p_text):
+    """
+
+    :param p_text:
+    :return:
+    """
     letter_frequencies = {}
 
-    for letter in text:
+    for letter in p_text:
         if letter.isalpha():
             if letter in letter_frequencies:
                 letter_frequencies[letter] += 1
@@ -71,21 +101,31 @@ def calculate_coincidence_index(text):
     return coincidence_index
 
 
-def calculate_freq(text):
+def calculate_freq(p_text):
+    """
+
+    :param p_text:
+    :return:
+    """
     freq = {}
     total = 0
-    for char in text:
+    for char in p_text:
         if char in string.ascii_uppercase:
             freq[char] = freq.get(char, 0) + 1
             total += 1
     for char in freq:
-        freq[char] = freq[char] / total
+        freq[char] /= total
     return freq
 
 
-def haeufigkeit(letters):
-    letters = letters.upper()
-    freq = calculate_freq(letters)
+def haeufigkeit(p_letters):
+    """
+
+    :param p_letters:
+    :return:
+    """
+    p_letters = p_letters.upper()
+    freq = calculate_freq(p_letters)
     highest_letter = max(freq, key=freq.get)
     highest_letter = highest_letter.lower()
     i = 0
@@ -98,20 +138,33 @@ def haeufigkeit(letters):
     return index_to_letter[i]
 
 
-def haeufigkeitsanalyse(letters, a, gcd):
+def haeufigkeitsanalyse(p_letters, p_a, p_gcd):
+    """
+
+    :param p_letters:
+    :param p_a:
+    :param p_gcd:
+    :return:
+    """
     haeufigkeitsanalyse_key = ""
-    for x in range(gcd):
+    for x in range(p_gcd):
         x_letters = ""
-        for y in range(a-1):  # a-1 falls letztes Pattern unvollstädig
-            x_letters += letters[y][x]
+        for y in range(p_a - 1):  # a-1 falls letztes Pattern unvollstädig
+            x_letters += p_letters[y][x]
         haeufigkeitsanalyse_key += haeufigkeit(x_letters)
     return haeufigkeitsanalyse_key
 
 
-def keyfinder(keyfinder_chiffrat, gcd):
-    split_chiffrat = [keyfinder_chiffrat[i:i + gcd] for i in range(0, len(keyfinder_chiffrat), gcd)]
+def keyfinder(p_chiffrat, p_gcd):
+    """
+
+    :param p_chiffrat:
+    :param p_gcd:
+    :return:
+    """
+    split_chiffrat = [p_chiffrat[i:i + p_gcd] for i in range(0, len(p_chiffrat), p_gcd)]
     a = len(split_chiffrat)
-    letters = [[None for _ in range(gcd)] for _ in range(a)]
+    letters = [[None for _ in range(p_gcd)] for _ in range(a)]
     i = 0
     for each_split in split_chiffrat:
         j = 0
@@ -119,50 +172,67 @@ def keyfinder(keyfinder_chiffrat, gcd):
             letters[i][j] = letter
             j += 1
         i += 1
-    keyfinder_key = haeufigkeitsanalyse(letters, a, gcd)
+    keyfinder_key = haeufigkeitsanalyse(letters, a, p_gcd)
     return keyfinder_key
 
 
-def decrypt(decrypt_chiffrat):
-    gcd = kasiskitest(decrypt_chiffrat)
-    decrypt_key = keyfinder(decrypt_chiffrat, gcd)
-    decrypt_klartext, decrypt_key = decryptwithkey(decrypt_chiffrat, decrypt_key)
+def decrypt(p_chiffrat):
+    """
+
+    :param p_chiffrat:
+    :return:
+    """
+    gcd = kasiskitest(p_chiffrat)
+    decrypt_key = keyfinder(p_chiffrat, gcd)
+    decrypt_klartext, decrypt_key = decryptwithkey(p_chiffrat, decrypt_key)
     return decrypt_klartext, decrypt_key
 
 
-def decryptwithkey(decryptwithkey_chiffrat, decryptwith_key):
+def decryptwithkey(p_chiffrat, p_key):
+    """
+
+    :param p_chiffrat:
+    :param p_key:
+    :return:
+    """
     decrypted = ""
     split_chiffrat = \
-        [decryptwithkey_chiffrat[i:i + len(decryptwith_key)] for i in range(0, len(decryptwithkey_chiffrat),
-                                                                            len(decryptwith_key))]
+        [p_chiffrat[i:i + len(p_key)] for i in range(0, len(p_chiffrat),
+                                                     len(p_key))]
 
     for each_split in split_chiffrat:
         i = 0
         for letter in each_split:
-            number = (letter_to_index[letter] - letter_to_index[decryptwith_key[i]]) % len(alphabet)
+            number = (letter_to_index[letter] - letter_to_index[p_key[i]]) % len(alphabet)
             decrypted += index_to_letter[number]
             i += 1
 
-    return decrypted, decryptwith_key
+    return decrypted, p_key
 
 
-def encryptwithkey(text, encryptwith_key):
+def encryptwithkey(p_text, p_key):
+    """
+
+    :param p_text:
+    :param p_key:
+    :return:
+    """
     encrypted = ""
-    split_chiffrat = [text[i:i + len(encryptwith_key)] for i in range(0, len(text), len(encryptwith_key))]
+    split_chiffrat = [p_text[i:i + len(p_key)] for i in range(0, len(p_text), len(p_key))]
 
     for each_split in split_chiffrat:
         i = 0
         for letter in each_split:
-            number = (letter_to_index[letter] + letter_to_index[encryptwith_key[i]]) % len(alphabet)
+            number = (letter_to_index[letter] + letter_to_index[p_key[i]]) % len(alphabet)
             encrypted += index_to_letter[number]
             i += 1
 
-    return encrypted, encryptwith_key
+    return encrypted, p_key
 
 
 if __name__ == "__main__":
     path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2.txt"
-    with open(path, "r") as file:
+    with open(path) as file:
         chiffrat = file.read()
     chiffrat = chiffrat.lower()
     klartext, key = decrypt(chiffrat)
@@ -186,8 +256,11 @@ if __name__ == "__main__":
 
 
 def quickstart():
+    """
+    schnell-entschlüsselung mit richtigen Schlüssel
+    """
     quickstart_path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2.txt"
-    with open(quickstart_path, "r") as quickstart_file:
+    with open(quickstart_path) as quickstart_file:
         quickstart_chiffrat = quickstart_file.read()
     quickstart_chiffrat = quickstart_chiffrat.lower()
     quickstart_key = "fwqgczxugp"

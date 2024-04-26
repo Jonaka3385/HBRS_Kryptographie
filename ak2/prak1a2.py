@@ -1,218 +1,212 @@
+"""
+Praktikum 1 Aufgabe 2
+p_ = Übergebener Parameter
+"""
 from random import randrange
 from hashlib import sha256
 from gmpy2 import xmpz, to_binary, invert, powmod, is_prime
 
 
-def generate_p_q(gen_pq_l, gen_pq_n):
+def generate_p_q(p_l, p_n):
     """
-
-    :param gen_pq_l: l
-    :param gen_pq_n: n
-    :return: p, q
+    :param p_l: l
+    :param p_n: n
+    :return generated_p, generated_q: die generierten p, q
     """
-    gen_pq_g = gen_pq_n  # g >= 160
-    gen_pq_n2 = (gen_pq_l - 1) // gen_pq_g
-    gen_pq_b = (gen_pq_l - 1) % gen_pq_g
+    g = p_n  # g >= 160
+    n2 = (p_l - 1) // g
+    b = (p_l - 1) % g
     while True:
         # generate q
         while True:
             # noinspection PyArgumentList
-            s = xmpz(randrange(1, 2 ** gen_pq_g))
+            s = xmpz(randrange(1, 2 ** g))
             a = sha256(to_binary(s)).hexdigest()
-            zz = (s + 1) % (2 ** gen_pq_g)
+            zz = (s + 1) % (2 ** g)
             z = sha256(to_binary(zz)).hexdigest()
             u = int(a, 16) ^ int(z, 16)
-            mask = 2 ** (gen_pq_n - 1) + 1  # nn-1 und niedrigste Bit auf 1 setzen rest 0
-            generated_q = u | mask  # u OR mask
-            if is_prime(generated_q, 20):
+            mask = 2 ** (p_n - 1) + 1  # nn-1 und niedrigste Bit auf 1 setzen rest 0
+            q = u | mask  # u OR mask
+            if is_prime(q, 20):
                 break
         # generate p
         i = 0  # counter
         j = 2  # offset
         while i < 4096:
             v = []
-            for counter in range(gen_pq_n2 + 1):
-                arg = (s + j + counter) % (2 ** gen_pq_g)
+            for counter in range(n2 + 1):
+                arg = (s + j + counter) % (2 ** g)
                 zzv = sha256(to_binary(arg)).hexdigest()
                 v.append(int(zzv, 16))
             w = 0
-            for counter2 in range(0, gen_pq_n2):
+            for counter2 in range(0, n2):
                 w += v[counter2] * 2 ** (160 * counter2)
-            w += (v[gen_pq_n2] % 2 ** gen_pq_b) * 2 ** (160 * gen_pq_n2)
-            xx = w + 2 ** (gen_pq_l - 1)
-            c = xx % (2 * generated_q)
-            generated_p = xx - c + 1  # p = x - (c-1)
-            if generated_p >= 2 ** (gen_pq_l - 1):
-                if is_prime(generated_p, 10):
-                    return generated_p, generated_q
+            w += (v[n2] % 2 ** b) * 2 ** (160 * n2)
+            xx = w + 2 ** (p_l - 1)
+            c = xx % (2 * q)
+            p = xx - c + 1  # p = x - (c-1)
+            if p >= 2 ** (p_l - 1):
+                if is_prime(p, 10):
+                    return p, q
             i += 1
-            j += gen_pq_n2 + 1
+            j += n2 + 1
 
 
-def generate_alpha(generatealpha_p, generatealpha_q):
+def generate_alpha(p_p, p_q):
     """
-
-    :param generatealpha_p: p
-    :param generatealpha_q: q
-    :return: alpha
+    :param p_p: p
+    :param p_q: q
+    :return generated_alpha: alpha
     """
     while True:
-        generatealpha_h = randrange(2, generatealpha_p - 1)
-        generatealpha_exp = (generatealpha_p - 1) // generatealpha_q
-        generated_alpha = powmod(generatealpha_h, generatealpha_exp, generatealpha_p)
-        if generated_alpha > 1:
+        h = randrange(2, p_p - 1)
+        exp = (p_p - 1) // p_q
+        alpha = powmod(h, exp, p_p)
+        if alpha > 1:
             break
-    return generated_alpha
+    return alpha
 
 
-def generate_params(generate_params_key_length, generate_params_n):
+def generate_params(p_length, p_n):
     """
-
-    :param generate_params_key_length: Schlüssellänge
-    :param generate_params_n: n
+    :param p_length: Schlüssellänge
+    :param p_n: n
     :return: p, q, alpha
     """
-    generated_param_p, generated_param_q = generate_p_q(generate_params_key_length, generate_params_n)
-    generated_param_alpha = generate_alpha(generated_param_p, generated_param_q)
-    return generated_param_p, generated_param_q, generated_param_alpha
+    p, q = generate_p_q(p_length, p_n)
+    alpha = generate_alpha(p, q)
+    return p, q, alpha
 
 
-def generate_keys(generate_keys_g, generate_keys_p, generate_keys_q):
+def generate_keys(p_g, p_p, p_q):
     """
-
-    :param generate_keys_g: g
-    :param generate_keys_p: p
-    :param generate_keys_q: q
+    :param p_g: g
+    :param p_p: p
+    :param p_q: q
     :return: x, y
     """
-    generated_x = randrange(2, generate_keys_q)  # x < q
-    generated_y = powmod(generate_keys_g, generated_x, generate_keys_p)
-    return generated_x, generated_y
+    x = randrange(2, p_q)  # x < q
+    y = powmod(p_g, x, p_p)
+    return x, y
 
 
-def validate_params(validate_params_p, validate_params_q, validate_params_alpha):
+def validate_params(p_p, p_q, p_alpha):
     """
-
-    :param validate_params_p: p
-    :param validate_params_q: q
-    :param validate_params_alpha: alpha
+    :param p_p: p
+    :param p_q: q
+    :param p_alpha: alpha
     :return: boolean-Ergebnis der validierung
     """
-    if is_prime(validate_params_p) and is_prime(validate_params_q):
-        if powmod(validate_params_alpha, validate_params_q, validate_params_p) == 1 and validate_params_alpha > 1 and \
-                ((validate_params_p - 1) % validate_params_q) == 0:
+    if is_prime(p_p) and is_prime(p_q):
+        if powmod(p_alpha, p_q, p_p) == 1 and p_alpha > 1 and \
+                ((p_p - 1) % p_q) == 0:
             return True
     return False
 
 
-def validate_sign(validatesign_gamma, validatesign_delta, validatesign_q):
+def validate_sign(p_gamma, p_delta, p_q):
     """
-
-    :param validatesign_gamma: gamma
-    :param validatesign_delta: delta
-    :param validatesign_q: q
+    :param p_gamma: gamma
+    :param p_delta: delta
+    :param p_q: q
     :return: boolean-Ergebnis der validierung von der Signatur
     """
-    if 0 > validatesign_gamma > validatesign_q:
+    if 0 > p_gamma > p_q:
         return False
-    if 0 > validatesign_delta > validatesign_q:
+    if 0 > p_delta > p_q:
         return False
     return True
 
 
-def sign(sign_msg, sign_p, sign_q, sign_alpha, sign_privkey):
+def sign(p_msg, p_p, p_q, p_alpha, p_privkey):
     """
-
-    :param sign_msg: message to sign
-    :param sign_p: p
-    :param sign_q: q
-    :param sign_alpha: alpha
-    :param sign_privkey: private key
+    :param p_msg: message to sign
+    :param p_p: p
+    :param p_q: q
+    :param p_alpha: alpha
+    :param p_privkey: private key
     :return: gamma, delta, k
     """
-    if not validate_params(sign_p, sign_q, sign_alpha):
+    if not validate_params(p_p, p_q, p_alpha):
         raise Exception('Invalid params')
     while True:
-        sign_k = randrange(2, sign_q)  # k < q
-        sign_gamma = powmod(sign_alpha, sign_k, sign_p) % sign_q
-        sign_m = int(sha256(sign_msg).hexdigest(), 16)
+        k = randrange(2, p_q)  # k < q
+        gamma = powmod(p_alpha, k, p_p) % p_q
+        m = int(sha256(p_msg).hexdigest(), 16)
         try:
-            sign_delta = (invert(sign_k, sign_q) * (sign_m + sign_privkey * sign_gamma)) % sign_q
-            return sign_gamma, sign_delta, sign_k
+            delta = (invert(k, p_q) * (m + p_privkey * gamma)) % p_q
+            return gamma, delta, k
         except ZeroDivisionError:
             pass
 
 
-def sign_with_k(signwk_msg, signwk_p, signwk_q, signwk_alpha, signwk_a, signwk_k):
+def sign_with_k(p_msg, p_p, p_q, p_alpha, p_a, p_k):
     """
-
-    :param signwk_msg: message to sign
-    :param signwk_p: p
-    :param signwk_q: q
-    :param signwk_alpha: alpha
-    :param signwk_a: a
-    :param signwk_k: k
+    :param p_msg: message to sign
+    :param p_p: p
+    :param p_q: q
+    :param p_alpha: alpha
+    :param p_a: a
+    :param p_k: k
     :return: r, delta, k
     """
-    if not validate_params(signwk_p, signwk_q, signwk_alpha):
+    if not validate_params(p_p, p_q, p_alpha):
         raise Exception('Invalid params')
     while True:
-        signwk_r = powmod(signwk_alpha, signwk_k, signwk_p) % signwk_q
-        signwk_m = int(sha256(signwk_msg).hexdigest(), 16)
+        r = powmod(p_alpha, p_k, p_p) % p_q
+        m = int(sha256(p_msg).hexdigest(), 16)
         try:
-            signwk_delta = (invert(signwk_k, signwk_q) * (signwk_m + signwk_a * signwk_r)) % signwk_q
-            return signwk_r, signwk_delta, signwk_k
+            delta = (invert(p_k, p_q) * (m + p_a * r)) % p_q
+            return r, delta, p_k
         except ZeroDivisionError:
             pass
 
 
-def verify(verify_msg, verify_gamma, verify_delta, verify_p, verify_q, verify_alpha, verify_beta):
+def verify(p_msg, p_gamma, p_delta, p_p, p_q, p_alpha, p_beta):
     """
-
-    :param verify_msg: message to verify
-    :param verify_gamma: gamma
-    :param verify_delta: delta
-    :param verify_p: p
-    :param verify_q: q
-    :param verify_alpha: alpha
-    :param verify_beta: beta
+    :param p_msg: message to verify
+    :param p_gamma: gamma
+    :param p_delta: delta
+    :param p_p: p
+    :param p_q: q
+    :param p_alpha: alpha
+    :param p_beta: beta
     :return: boolean-Ergebnis vom Verifizieren
     """
-    if not validate_params(verify_p, verify_q, verify_alpha):
+    if not validate_params(p_p, p_q, p_alpha):
         raise Exception('Invalid params')
-    if not validate_sign(verify_gamma, verify_delta, verify_q):
+    if not validate_sign(p_gamma, p_delta, p_q):
         return False
     try:
-        w = invert(verify_delta, verify_q)
+        w = invert(p_delta, p_q)
     except ZeroDivisionError:
         return False
-    m = int(sha256(verify_msg).hexdigest(), 16)
-    u1 = (m * w) % verify_q
-    u2 = (verify_gamma * w) % verify_q
-    v = (powmod(verify_alpha, u1, verify_p) * powmod(verify_beta, u2, verify_p)) % verify_p % verify_q
-    if v == verify_gamma:
+    m = int(sha256(p_msg).hexdigest(), 16)
+    u1 = (m * w) % p_q
+    u2 = (p_gamma * w) % p_q
+    v = (powmod(p_alpha, u1, p_p) * powmod(p_beta, u2, p_p)) % p_p % p_q
+    if v == p_gamma:
         return True
     return False
 
 
-def private_key_finder(pkf_msg1, pkf_msg2, pkf_delta1, pkf_delta2, pkf_q, pkf_gamma):
+def private_key_finder(p_msg1, p_msg2, p_delta1, p_delta2, p_q, p_gamma):
     """
-
-    :param pkf_msg1: erste message
-    :param pkf_msg2: zweite message
-    :param pkf_delta1: delta der ersten message
-    :param pkf_delta2: delta der zweiten message
-    :param pkf_q: q
-    :param pkf_gamma: gamma
+    :param p_msg1: erste message
+    :param p_msg2: zweite message
+    :param p_delta1: delta der ersten message
+    :param p_delta2: delta der zweiten message
+    :param p_q: q
+    :param p_gamma: gamma
     :return: nothing (private key will be printed in console)
     """
-    pkf_h1 = int(sha256(pkf_msg1).hexdigest(), 16)
-    pkf_h2 = int(sha256(pkf_msg2).hexdigest(), 16)
+    h1 = int(sha256(p_msg1).hexdigest(), 16)
+    h2 = int(sha256(p_msg2).hexdigest(), 16)
 
-    pkf_delta1_inv = pow(pkf_delta1, -1, pkf_q)
-    pkf_delta2_inv = pow(pkf_delta2, -1, pkf_q)
-    x_calc = ((pkf_h1 * pkf_delta1_inv - pkf_h2 * pkf_delta2_inv) * pow(pkf_gamma, -1, pkf_q)
-              * pow((pkf_delta2_inv - pkf_delta1_inv), -1, pkf_q)) % pkf_q
+    delta1_inv = pow(p_delta1, -1, p_q)
+    delta2_inv = pow(p_delta2, -1, p_q)
+    x_calc = ((h1 * delta1_inv - h2 * delta2_inv) * pow(p_gamma, -1, p_q)
+              * pow((delta2_inv - delta1_inv), -1, p_q)) % p_q
 
     print(f'Privater Schlüssel: {x_calc}')
     return
@@ -243,8 +237,7 @@ if __name__ == '__main__':
         text1 = text
         msg1, gamma1, delta1 = msg, gamma, delta
 
-    #
-    # next Text
+    # Next Text
 
     text = 'Hallo, Menschen!'
     msg = str.encode(text)
@@ -265,6 +258,5 @@ if __name__ == '__main__':
         text2 = text
         msg2, gamma2, delta2 = msg, gamma, delta
 
-    #
-    # faelschung erzeugen
+    # Faelschung erzeugen
     private_key_finder(msg1, msg2, delta1, delta2, q, gamma)

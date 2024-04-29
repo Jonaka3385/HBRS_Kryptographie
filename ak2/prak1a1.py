@@ -13,100 +13,36 @@ def generate_key(p_bit_size, p_pub_exp):
     """
     :param p_bit_size:
     :param p_pub_exp:
-    :return: private and public key (pem encoded)
+    :return: private and public key (pem coded)
     """
     priv_key = rsa.generate_private_key(
         public_exponent=p_pub_exp,
         key_size=p_bit_size,
         backend=default_backend()
     )
+    pub_key = priv_key.public_key()
+    return priv_key, pub_key
 
+
+def key_to_pem(p_priv_key, p_pub_key):
+    """
+    :param p_priv_key:
+    :param p_pub_key:
+    :return:
+    """
     # privater Schlüssel PEM-codiert als String
-    priv_key_pem = priv_key.private_bytes(
+    priv_key_pem = p_priv_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.NoEncryption()
     ).decode()
 
     # öffentlicher Schlüssel PEM-kodiert als String
-    pub_key_pem = priv_key.public_key().public_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PublicFormat.SubjectPublicKeyInfo
-    ).decode()
-
-    path_priv = '/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak2/prak1Files/priv_key.pem'
-    path_pub = '/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak2/prak1Files/pub_key.pem'
-    # privaten Schlüssel als PEM-Datei schreiben
-    with open(path_priv, 'wb') as f:
-        f.write(priv_key.private_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.PKCS8,
-            encryption_algorithm=serialization.NoEncryption()
-        ))
-
-    # öffentlichen Schlüssel als PEM-Datei schreiben
-    with open(path_pub, 'wb') as f:
-        f.write(priv_key.public_key().public_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo
-        ))
-
-    return priv_key_pem, pub_key_pem
-
-
-def generate_key_only(p_bit_size, p_pub_exp):
-    """
-    :param p_bit_size:
-    :param p_pub_exp:
-    :return: rsa private key
-    """
-    return rsa.generate_private_key(
-        public_exponent=p_pub_exp,
-        key_size=p_bit_size,
-        backend=default_backend()
-    )
-
-
-def key_to_pem_string(p_key):
-    """
-    :param p_key:
-    :return: private and public key (pem encoded)
-    """
-    # privater Schlüssel PEM-kodiert als String
-    priv_key_pem = p_key.private_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.PKCS8,
-        encryption_algorithm=serialization.NoEncryption()
-    ).decode()
-
-    # öffentlicher Schlüssel PEM-kodiert als String
-    pub_key_pem = p_key.public_key().public_bytes(
+    pub_key_pem = p_pub_key.public_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo
     ).decode()
     return priv_key_pem, pub_key_pem
-
-
-def key_to_file(p_key, p_path_priv, p_path_pub):
-    """
-    :param p_key:
-    :param p_path_priv:
-    :param p_path_pub:
-    """
-    # privaten Schlüssel als PEM-Datei schreiben
-    with open(p_path_priv, 'wb') as f:
-        f.write(p_key.private_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.PKCS8,
-            encryption_algorithm=serialization.NoEncryption()
-        ))
-
-    # öffentlichen Schlüssel als PEM-Datei schreiben
-    with open(p_path_pub, 'wb') as f:
-        f.write(p_key.public_key().public_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo
-        ))
 
 
 def fast_modular_exponentation(p_a, p_b, p_n):
@@ -165,8 +101,8 @@ if __name__ == '__main__':
     # path_pub = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak2/prak1Files/pub_key.pem"
     bit_size = 3000
     exp = 65537  # 2^16 + 1
-    key = generate_key_only(bit_size, exp)
-    priv_key, pub_key = key_to_pem_string(key)
+    priv_key, pub_key = generate_key(bit_size, exp)
+    priv_key_pem, pub_key_pem = key_to_pem(priv_key, pub_key)
     # key_to_file(key, path_priv, path_pub)
     print(f'Keys: ')
     print(priv_key)
@@ -178,9 +114,9 @@ if __name__ == '__main__':
     print()
     print()
 
-    n = key.public_key().public_numbers().n
-    e = key.public_key().public_numbers().e
-    d = key.private_numbers().d
+    n = pub_key.public_numbers().n
+    e = pub_key.public_numbers().e
+    d = priv_key.private_numbers().d
     print(n, e, d, sep='\n')
     print()
 

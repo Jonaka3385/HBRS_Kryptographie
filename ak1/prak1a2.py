@@ -12,7 +12,6 @@ index_to_letter = dict(zip(range(len(alphabet)), alphabet))
 
 def relhaeufigkeit(p_text):
     """
-
     :param p_text:
     :return:
     """
@@ -33,7 +32,6 @@ def relhaeufigkeit(p_text):
 
 def find_trigrams(p_text):
     """
-
     :param p_text:
     :return:
     """
@@ -49,7 +47,6 @@ def find_trigrams(p_text):
 
 def find_distances(p_trigram_indices):
     """
-
     :param p_trigram_indices:
     :return:
     """
@@ -62,26 +59,21 @@ def find_distances(p_trigram_indices):
 
 def kasiskitest(p_chiffrat):
     """
-
     :param p_chiffrat:
     :return:
     """
     trigrams = find_trigrams(p_chiffrat)
-
     sorted_trigrams = sorted(trigrams.items(), key=lambda x: len(x[1]), reverse=True)
-
     distances = find_distances(sorted_trigrams[0][1])
 
     gcd = distances[0]
     for i in range(1, len(distances)):
         gcd = math.gcd(gcd, distances[i])
-
     return gcd
 
 
 def calculate_coincidence_index(p_text):
     """
-
     :param p_text:
     :return:
     """
@@ -93,17 +85,14 @@ def calculate_coincidence_index(p_text):
                 letter_frequencies[letter] += 1
             else:
                 letter_frequencies[letter] = 1
-
     n = sum(letter_frequencies.values())
     coincidence_index = sum((letter_frequencies[letter] * (letter_frequencies[letter] - 1))
                             for letter in letter_frequencies) / (n * (n - 1))
-
     return coincidence_index
 
 
 def calculate_freq(p_text):
     """
-
     :param p_text:
     :return:
     """
@@ -120,7 +109,6 @@ def calculate_freq(p_text):
 
 def haeufigkeit(p_letters):
     """
-
     :param p_letters:
     :return:
     """
@@ -140,7 +128,6 @@ def haeufigkeit(p_letters):
 
 def haeufigkeitsanalyse(p_letters, p_a, p_gcd):
     """
-
     :param p_letters:
     :param p_a:
     :param p_gcd:
@@ -157,7 +144,6 @@ def haeufigkeitsanalyse(p_letters, p_a, p_gcd):
 
 def keyfinder(p_chiffrat, p_gcd):
     """
-
     :param p_chiffrat:
     :param p_gcd:
     :return:
@@ -178,19 +164,17 @@ def keyfinder(p_chiffrat, p_gcd):
 
 def decrypt(p_chiffrat):
     """
-
     :param p_chiffrat:
     :return:
     """
     gcd = kasiskitest(p_chiffrat)
     decrypt_key = keyfinder(p_chiffrat, gcd)
-    decrypt_klartext, decrypt_key = decryptwithkey(p_chiffrat, decrypt_key)
+    decrypt_klartext = decryptwithkey(p_chiffrat, decrypt_key)
     return decrypt_klartext, decrypt_key
 
 
 def decryptwithkey(p_chiffrat, p_key):
     """
-
     :param p_chiffrat:
     :param p_key:
     :return:
@@ -207,12 +191,11 @@ def decryptwithkey(p_chiffrat, p_key):
             decrypted += index_to_letter[number]
             i += 1
 
-    return decrypted, p_key
+    return decrypted
 
 
 def encryptwithkey(p_text, p_key):
     """
-
     :param p_text:
     :param p_key:
     :return:
@@ -231,7 +214,7 @@ def encryptwithkey(p_text, p_key):
 
 
 if __name__ == "__main__":
-    path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2.txt"
+    path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2_t.txt"
     with open(path) as file:
         chiffrat = file.read()
     chiffrat = chiffrat.lower()
@@ -243,9 +226,17 @@ if __name__ == "__main__":
     print("Schlüssel: ")
     print(key)
     print()
+    keylen_bool = False
     while input("Korrekt(j/n)?: ") == "n":
-        key = input("Neuer Key-Vorschlag: ")
-        klartext, key = decryptwithkey(chiffrat, key)
+        if not keylen_bool:
+            if input("Schlüssellänge korrekt?: ") != "n":
+                keylen_bool = True
+            else:
+                new_keylen = int(input("Neue Schlüssellänge: "))
+                key = keyfinder(chiffrat, new_keylen)
+        if keylen_bool:
+            key = input("Neuer Key-Vorschlag: ")
+        klartext = decryptwithkey(chiffrat, key)
         klartext = klartext.upper()
         print("Klartext: ")
         print(klartext)
@@ -259,11 +250,12 @@ def quickstart():
     """
     schnell-entschlüsselung mit richtigen Schlüssel
     """
-    quickstart_path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2.txt"
+    quickstart_path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2_t.txt"
     with open(quickstart_path) as quickstart_file:
         quickstart_chiffrat = quickstart_file.read()
     quickstart_chiffrat = quickstart_chiffrat.lower()
-    quickstart_key = "fwqgczxugp"
+    # quickstart_key = "fwqgczxugp" //für chiffrat2, folgende für chiffrat2_t
+    quickstart_key = "nfxsdljr"
     quickstart_klartext, quickstart_key = decryptwithkey(quickstart_chiffrat, quickstart_key)
     quickstart_klartext = quickstart_klartext.upper()
     print("Klartext: ")

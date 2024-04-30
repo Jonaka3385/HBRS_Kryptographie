@@ -181,8 +181,7 @@ def decryptwithkey(p_chiffrat, p_key):
     """
     decrypted = ""
     split_chiffrat = \
-        [p_chiffrat[i:i + len(p_key)] for i in range(0, len(p_chiffrat),
-                                                     len(p_key))]
+        [p_chiffrat[i:i + len(p_key)] for i in range(0, len(p_chiffrat), len(p_key))]
 
     for each_split in split_chiffrat:
         i = 0
@@ -190,7 +189,6 @@ def decryptwithkey(p_chiffrat, p_key):
             number = (letter_to_index[letter] - letter_to_index[p_key[i]]) % len(alphabet)
             decrypted += index_to_letter[number]
             i += 1
-
     return decrypted
 
 
@@ -209,25 +207,37 @@ def encryptwithkey(p_text, p_key):
             number = (letter_to_index[letter] + letter_to_index[p_key[i]]) % len(alphabet)
             encrypted += index_to_letter[number]
             i += 1
-
     return encrypted, p_key
 
 
+def quickstart():
+    """
+    schnell-entschlüsselung mit richtigen Schlüssel
+    """
+    q_path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2_t.txt"
+    with open(q_path) as q_file:
+        q_chiffrat = q_file.read()
+    q_chiffrat = q_chiffrat.lower()
+    # q_key = "fwqgczxugp" //für chiffrat2, folgende für chiffrat2_t
+    q_key = "nfxsdljr"
+    q_klartext = decryptwithkey(q_chiffrat, q_key)
+    q_klartext = q_klartext.upper()
+    print(f'Klartext: {q_klartext}', f'Schlüssel: {q_key}', sep='\n')
+
+
 if __name__ == "__main__":
+    # quickstart()
+    # quit()
     path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2_t.txt"
     with open(path) as file:
         chiffrat = file.read()
     chiffrat = chiffrat.lower()
     klartext, key = decrypt(chiffrat)
     klartext = klartext.upper()
-    print("Klartext: ")
-    print(klartext)
-    print()
-    print("Schlüssel: ")
-    print(key)
-    print()
+    print(f'Klartext: {klartext}', f'Schlüssel: {key}', sep='\n')
     keylen_bool = False
     while input("Korrekt(j/n)?: ") == "n":
+        print()
         if not keylen_bool:
             if input("Schlüssellänge korrekt?: ") != "n":
                 keylen_bool = True
@@ -238,29 +248,4 @@ if __name__ == "__main__":
             key = input("Neuer Key-Vorschlag: ")
         klartext = decryptwithkey(chiffrat, key)
         klartext = klartext.upper()
-        print("Klartext: ")
-        print(klartext)
-        print()
-        print("Schlüssel: ")
-        print(key)
-        print()
-
-
-def quickstart():
-    """
-    schnell-entschlüsselung mit richtigen Schlüssel
-    """
-    quickstart_path = "/Users/jonas/Documents/JetBrains_Projects/PyCharm/Kryptographie/ak1/prak1Files/chiffrat2_t.txt"
-    with open(quickstart_path) as quickstart_file:
-        quickstart_chiffrat = quickstart_file.read()
-    quickstart_chiffrat = quickstart_chiffrat.lower()
-    # quickstart_key = "fwqgczxugp" //für chiffrat2, folgende für chiffrat2_t
-    quickstart_key = "nfxsdljr"
-    quickstart_klartext, quickstart_key = decryptwithkey(quickstart_chiffrat, quickstart_key)
-    quickstart_klartext = quickstart_klartext.upper()
-    print("Klartext: ")
-    print(quickstart_klartext)
-    print()
-    print("Schlüssel: ")
-    print(quickstart_key)
-    print()
+        print(f'Klartext: {klartext}', f'Schlüssel: {key}', sep='\n')

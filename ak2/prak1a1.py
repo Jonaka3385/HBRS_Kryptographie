@@ -1,50 +1,3 @@
-"""
-Praktikum 1 Aufgabe 1
-p_ = Übergebener Parameter
-"""
-import random
-
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
-
-
-def generate_key(p_bit_size, p_pub_exp):
-    """
-    :param p_bit_size:
-    :param p_pub_exp:
-    :return: private and public key (pem coded)
-    """
-    priv_key = rsa.generate_private_key(
-        public_exponent=p_pub_exp,
-        key_size=p_bit_size,
-        backend=default_backend()
-    )
-    pub_key = priv_key.public_key()
-    return priv_key, pub_key
-
-
-def key_to_pem(p_priv_key, p_pub_key):
-    """
-    :param p_priv_key:
-    :param p_pub_key:
-    :return:
-    """
-    # privater Schlüssel PEM-codiert als String
-    priv_key_pem = p_priv_key.private_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.PKCS8,
-        encryption_algorithm=serialization.NoEncryption()
-    ).decode()
-
-    # öffentlicher Schlüssel PEM-kodiert als String
-    pub_key_pem = p_pub_key.public_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PublicFormat.SubjectPublicKeyInfo
-    ).decode()
-    return priv_key_pem, pub_key_pem
-
-
 def fast_modular_exponentation(p_a, p_b, p_n):
     """
     :param p_a:
@@ -59,26 +12,6 @@ def fast_modular_exponentation(p_a, p_b, p_n):
         p_a = (p_a * p_a) % p_n
         p_b //= 2
     return result
-
-
-def signatur(p_msg, p_n, p_d):
-    """
-    :param p_msg:
-    :param p_n:
-    :param p_d:
-    :return: fme_result
-    """
-    return fast_modular_exponentation(p_msg, p_d, p_n)
-
-
-def verifikation(p_signature, p_n, p_d):
-    """
-    :param p_signature:
-    :param p_n:
-    :param p_d:
-    :return: fme_result
-    """
-    return fast_modular_exponentation(p_signature, p_d, p_n)
 
 
 def universelle_faelschung(p_msg, p_n, p_e, p_d):

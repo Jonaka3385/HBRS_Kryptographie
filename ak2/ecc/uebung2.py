@@ -30,8 +30,14 @@ def on_courve(point):
     :return: True, False
     """
     # E: y^2 = x^3 + 16x + 7  GF(31)
-    sum1 = (point.y ** 2) % 31
-    sum2 = ((point.x ** 3) + (16 * point.x) + 7) % 31
+    if isinstance(point, PointXY):
+        sum1 = (point.y ** 2) % 31
+        sum2 = ((point.x ** 3) + (16 * point.x) + 7) % 31
+    elif isinstance(point, PointXYZ):
+        sum1 = ((point.y ** 2) * point.z) % 31
+        sum2 = ((point.x ** 3) + ((16 * point.x) * (point.z ** 2)) + (7 * (point.z ** 3))) % 31
+    else:
+        return False
     return sum1 == sum2
 
 

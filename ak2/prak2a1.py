@@ -2,10 +2,10 @@ from random import randint
 from time import time
 
 
-def gcd(gcd_a, gcd_b):
-    if gcd_b == 0:
-        return gcd_a
-    return gcd(gcd_b, gcd_a % gcd_b)
+def gcd(a, b):
+    if b == 0:
+        return a
+    return gcd(b, a % b)
 
 
 def isPrime(number):

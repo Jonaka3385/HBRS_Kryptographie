@@ -1,6 +1,8 @@
-def is_ascii_bytes(bytes_array):
+decoding = 'ascii'
+
+def is_text_bytes(bytes_array):
     try:
-        bytes_array.decode('ascii')
+        bytes_array.decode(decoding)
         return True
     except UnicodeDecodeError:
         return False
@@ -21,10 +23,10 @@ def decrypt():
         plaintext = bytearray(N)
         for j in range(N):
             plaintext[j] = ciphertext[j] ^ partial_keystream[j]
-        if is_ascii_bytes(plaintext):
+        if is_text_bytes(plaintext):
             print(f"Found potential keystream at index {i}")
             print(plaintext)
-            print(plaintext.decode('ascii'))
+            print(plaintext.decode(decoding))
 
 
 if __name__ == '__main__':

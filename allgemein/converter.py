@@ -12,17 +12,17 @@ def inttobyte(a):
 
 
 def nexttwosplitted(a, b):
-    tmpint = a*2
+    tmpint = a * 2
     tmptxt = ''
-    for i in range(tmpint, tmpint+2):
+    for i in range(tmpint, tmpint + 2):
         tmptxt = tmptxt + b[i]
     return tmptxt[0], tmptxt[1]
 
 
 def nextfour(a, b):
-    tmpint = a*4
+    tmpint = a * 4
     tmptxt = ''
-    for i in range(tmpint, tmpint+4):
+    for i in range(tmpint, tmpint + 4):
         tmptxt = tmptxt + b[i]
     return tmptxt
 
@@ -35,7 +35,7 @@ def nexteightsplitted(a, b):
         tmptxt1 = tmptxt1 + b[i]
     for i in range(tmpint + 4, tmpint + 8):
         tmptxt2 = tmptxt2 + b[i]
-    return tmptxt1 ,tmptxt2
+    return tmptxt1, tmptxt2
 
 
 def nextascii(a, b):
@@ -48,7 +48,7 @@ def nextascii(a, b):
 
 def convertbintohex(input):
     output = ''
-    for x in range(0, int((len(input)/4))):
+    for x in range(0, int((len(input) / 4))):
         tmp = nextfour(x, input)
         if tmp == '0000':
             output = output + '0'
@@ -89,7 +89,7 @@ def convertbintohex(input):
 
 def convertbintoascii(input):
     output = ''
-    for x in range(0, int((len(input))/8)):
+    for x in range(0, int((len(input)) / 8)):
         a, b = nexteightsplitted(x, input)
         if a == '0010':
             if b == '0000':
@@ -371,7 +371,7 @@ def converthextobin(input):
 
 def converthextoascii(input):
     output = ''
-    for x in range(0, int((len(input))/2)):
+    for x in range(0, int((len(input)) / 2)):
         a, b = nexttwosplitted(x, input)
         if a == '2':
             if b == '0':
@@ -1046,7 +1046,7 @@ def convertasciitohex(input):
 
 def converthextoallascii(input):
     output = ''
-    for x in range(0, int((len(input))/2)):
+    for x in range(0, int((len(input)) / 2)):
         a, b = nexttwosplitted(x, input)
         if a == '0':
             if b == '0':

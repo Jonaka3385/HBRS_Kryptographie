@@ -11,8 +11,8 @@ def lfsr(lfsr_seed, laenge, p):
         for j in range(1, len(lfsr_seed)):
             tmp += x[j] * p[j]
             tmp %= 2
-        for j in range(len(lfsr_seed)-1, 0, -1):
-            x[j] = x[j-1]
+        for j in range(len(lfsr_seed) - 1, 0, -1):
+            x[j] = x[j - 1]
         x[0] = tmp
         print(x)
 

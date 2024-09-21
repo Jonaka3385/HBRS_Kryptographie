@@ -1,5 +1,6 @@
 decoding = 'ascii'
 
+
 def is_text_bytes(bytes_array):
     try:
         bytes_array.decode(decoding)

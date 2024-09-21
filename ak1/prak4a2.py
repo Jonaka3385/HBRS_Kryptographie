@@ -12,7 +12,7 @@ if __name__ == '__main__':
     text = lower_wo_blanks(text)
     print(f'key: {key}\n'
           f'text: {text}\n')
-    
+
     # Später mit Schleife durchprobieren
     # Schleifen begin
     key_begin = 'AA AA '
@@ -33,4 +33,3 @@ if __name__ == '__main__':
     print(f'decrypted equals original text: {dec == text}')
     print()
     # Schleifen Ende
-

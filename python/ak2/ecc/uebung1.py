@@ -1,6 +1,3 @@
-"""
-Uebung 1
-"""
 from gmpy2 import gcd, is_congruent, invert
 
 if __name__ == "__main__":

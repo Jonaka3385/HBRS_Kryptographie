@@ -1,6 +1,3 @@
-"""
-Uebung2
-"""
 from dataclasses import dataclass
 from gmpy2 import mpz
 
@@ -11,9 +8,6 @@ b = 0
 
 @dataclass
 class PointXYZ:
-    """
-    Point mit x, y, z
-    """
     x: mpz
     y: mpz
     z: mpz
@@ -21,18 +15,11 @@ class PointXYZ:
 
 @dataclass
 class PointXY:
-    """
-    Point mit x, y
-    """
     x: mpz
     y: mpz
 
 
 def on_courve(point):
-    """
-    :param point:
-    :return: True, False
-    """
     if isinstance(point, PointXY):
         # y^2 = x^3 + 16x + 7 mod GF(31)
         sum1 = (point.y ** 2) % gf
@@ -47,11 +34,6 @@ def on_courve(point):
 
 
 def is_congruent(point1, point2):
-    """
-    :param point1:
-    :param point2:
-    :return: is congruent
-    """
     if isinstance(point1, PointXY):
         x1 = point1.x % gf
         y1 = point1.y % gf
@@ -129,5 +111,3 @@ if __name__ == '__main__':
     a_h_con = is_congruent(p_c, p_h)
     b_f_con = is_congruent(p_b, p_f)
     print('congruent:', f'a zu c: {a_c_con}', f'a zu h: {a_h_con}', f'b zu f: {b_f_con}', sep='\n')
-
-    # 2.2

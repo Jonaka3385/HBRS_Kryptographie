@@ -35,10 +35,10 @@ class PointXY:
             y1 = self.y
             y2 = other.y
 
-            s = int(((y2 - y1) / (x2 - x1)) % gf)
+            s = int(((y2 - y1) / (x2 - x1)) % p)
 
-            x3 = ((s ** 2) - x1 - x2) % gf
-            y3 = ((s * (x1 - x3)) - y1) % gf
+            x3 = ((s ** 2) - x1 - x2) % p
+            y3 = ((s * (x1 - x3)) - y1) % p
 
             return PointXY(x3, y3)
 
@@ -60,10 +60,10 @@ class PointXY:
             x = self.x
             y = self.y
 
-            s = int(((3 * (x ** 2) + a) / (2 * y)) % gf)
+            s = int(((3 * (x ** 2) + a) / (2 * y)) % p)
 
-            x3 = ((s ** 2) - (2 * x)) % gf
-            y3 = ((s * (x - x3)) - y) % gf
+            x3 = ((s ** 2) - (2 * x)) % p
+            y3 = ((s * (x - x3)) - y) % p
 
             return PointXY(x3, y3)
 
@@ -107,13 +107,13 @@ class PointXYZ:
             z1 = self.z
             z2 = other.z
 
-            b_a = (y2 * z1 - y1 * z2) % gf
-            b_b = (x2 * z1 - x1 * z2) % gf
-            b_c = (b_a ** 2 * z1 * z2 - b_b ** 3 - 2 * b_b ** 2 * x1 * z2) % gf
+            b_a = (y2 * z1 - y1 * z2) % p
+            b_b = (x2 * z1 - x1 * z2) % p
+            b_c = (b_a ** 2 * z1 * z2 - b_b ** 3 - 2 * b_b ** 2 * x1 * z2) % p
 
-            x3 = (b_b * b_c) % gf
-            y3 = (b_a * (b_b ** 2 * x1 * z2 - b_c) - b_b ** 3 * y1 * z2) % gf
-            z3 = (b_b ** 3 * z1 * z2) % gf
+            x3 = (b_b * b_c) % p
+            y3 = (b_a * (b_b ** 2 * x1 * z2 - b_c) - b_b ** 3 * y1 * z2) % p
+            z3 = (b_b ** 3 * z1 * z2) % p
 
             return PointXYZ(x3, y3, z3)
 
@@ -136,14 +136,14 @@ class PointXYZ:
             y = self.y
             z = self.z
 
-            b_a = (a * z ** 2 + 3 * x ** 2) % gf
-            b_b = (y * z) % gf
-            b_c = (x * y * b_b) % gf
-            b_d = (b_a ** 2 - 8 * b_c) % gf
+            b_a = (a * z ** 2 + 3 * x ** 2) % p
+            b_b = (y * z) % p
+            b_c = (x * y * b_b) % p
+            b_d = (b_a ** 2 - 8 * b_c) % p
 
-            x3 = (2 * b_b * b_d) % gf
-            y3 = (b_a * (4 * b_c - b_d) - 8 * y ** 2 * b_b ** 2) % gf
-            z3 = (8 * b ** 3) % gf
+            x3 = (2 * b_b * b_d) % p
+            y3 = (b_a * (4 * b_c - b_d) - 8 * y ** 2 * b_b ** 2) % p
+            z3 = (8 * b ** 3) % p
 
             return PointXYZ(x3, y3, z3)
 
@@ -161,7 +161,7 @@ class PointXYZ:
 xyz_neutral = PointXYZ(0, 1, 0)
 xy_neutral = PointXY(None, None)
 
-gf = 0
+p = 0
 a = 0
 b = 0
 
@@ -169,8 +169,8 @@ def on_short_weierstrass(point: PointXY):
     x = point.x
     y = point.y
 
-    left = (y**2) % gf
-    right = (x**3 + a*x + b) % gf
+    left = (y**2) % p
+    right = (x**3 + a*x + b) % p
 
     return left == right
 
@@ -179,8 +179,8 @@ def on_homogenised_weierstrass(point: PointXYZ):
     y = point.y
     z = point.z
 
-    left = (y**2 * z) % gf
-    right = (x**3 + a * x * z**2 + b * z**3) % gf
+    left = (y**2 * z) % p
+    right = (x**3 + a * x * z**2 + b * z**3) % p
 
     return left == right
 
@@ -201,25 +201,29 @@ main() Methode
 if __name__ == "__main__":
     # Y^2*Z = X^3 + a*X*Z^2 + b*Z^3
     # y^2 = x^3 + a*X + b
-    """
-    gf = int(0xA9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5377)
+    p = int(0xA9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5377)
     a = int(0x7D5A0975FC2C3057EEF67530417AFFE7FB8055C126DC5C6CE94A4B44F330B5D9)
     b = int(0x26DC5C6CE94A4B44F330B5D9BBD77CBF958416295CF7E1CE6BCCDC18FF8C07B6)
-    p = PointXYZ(60306380415904663168568911239273826053144841234228559299517684417361346433053,
+
+    """
+    point_p = PointXYZ(60306380415904663168568911239273826053144841234228559299517684417361346433053,
                  74653857005150983469598545140707432309023702960881435319026826228339031179596, 1)
-    p_val = on_homogenised_weierstrass(p)
-    p2 = p.dbl()
-    p3 = p * 9
-    pq = p + p2
-    print(f'p: {p}, valid: {p_val}', f'p2 {p2}', f'p3 {p3}', f'pq {pq}', sep='\n')
+    p_val = on_homogenised_weierstrass(point_p)
+    p2 = point_p.dbl()
+    p3 = point_p * 9
+    pq = point_p + p2
+    print(f'point: {point_p}, valid: {p_val}', f'p2 {p2}', f'p3 {p3}', f'pq {pq}', sep='\n')
     """
-    gf = int(0xA9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5377)
-    a = int(0x7D5A0975FC2C3057EEF67530417AFFE7FB8055C126DC5C6CE94A4B44F330B5D9)
-    b = int(0x26DC5C6CE94A4B44F330B5D9BBD77CBF958416295CF7E1CE6BCCDC18FF8C07B6)
-    p = PointXY(60306380415904663168568911239273826053144841234228559299517684417361346433053,
+
+    """
+    point_p = PointXY(60306380415904663168568911239273826053144841234228559299517684417361346433053,
                  74653857005150983469598545140707432309023702960881435319026826228339031179596)
-    p_val = on_short_weierstrass(p)
-    p2 = p.dbl()
-    p3 = p * 9
-    pq = p + p2
-    print(f'p: {p}, valid: {p_val}', f'p2 {p2}', f'p3 {p3}', f'pq {pq}', sep='\n')
+    p_val = on_short_weierstrass(point_p)
+    p2 = point_p.dbl()
+    p3 = point_p * 9
+    pq = point_p + p2
+    print(f'point: {point_p}, valid: {p_val}', f'p2 {p2}', f'p3 {p3}', f'pq {pq}', sep='\n')
+    """
+
+    #DH
+    Gf = PointXY(0, 0)

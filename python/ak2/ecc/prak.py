@@ -53,6 +53,9 @@ class PointXY:
                 q = q + self
         return q
 
+    def __str__(self):
+        return f'({self.x}, {self.y})'
+
     def dbl(self):
         if self == xy_neutral or self.y == 0:
             return xy_neutral
@@ -69,9 +72,6 @@ class PointXY:
 
     def to_xyz(self):
         return PointXYZ(self.x, self.y, 1)
-
-    def __str__(self):
-        return f'({self.x}, {self.y})'
 
 """
 Projektiver Punkt
@@ -131,6 +131,9 @@ class PointXYZ:
                 q = q + self
         return q
 
+    def __str__(self):
+        return f'({self.x}, {self.y}, {self.z})'
+
     def dbl(self):
         if self == xyz_neutral:
             return xyz_neutral
@@ -155,12 +158,10 @@ class PointXYZ:
             return xy_neutral
         else:
             z_inv = mod_inv(self.z, p)
-            new_x = int(self.x * z_inv)
-            new_y = int(self.y * z_inv)
+            new_x = self.x * z_inv
+            new_y = self.y * z_inv
             return PointXY(new_x, new_y)
 
-    def __str__(self):
-        return f'({self.x}, {self.y}, {self.z})'
 
 xyz_neutral = PointXYZ(0, 1, 0)
 xy_neutral = PointXY(None, None)

@@ -183,6 +183,14 @@ p = 0
 a = 0
 b = 0
 
+def on_weierstrass(point):
+    if isinstance(point, PointXY):
+        return on_short_weierstrass(point)
+    elif isinstance(point, PointXYZ):
+        return on_homogenised_weierstrass(point)
+    else:
+        raise Exception("Point must be of type PointXY or PointXYZ")
+
 def on_short_weierstrass(point: PointXY):
     x1 = point.x
     y1 = point.y
@@ -242,11 +250,11 @@ def ecdh(point: PointXY):
     alice_point = gen_point(point, alice_x)
     bob_point = gen_point(point, bob_x)
 
-    point_from_bob = send_point(bob_point)
-    point_from_alice = send_point(alice_point)
+    point_bob = send_point(bob_point)
+    point_alice = send_point(alice_point)
 
-    alice_z = gen_point(point_from_bob, alice_x)
-    bob_z = gen_point(point_from_alice, bob_x)
+    alice_z = gen_point(point_bob, alice_x)
+    bob_z = gen_point(point_alice, bob_x)
 
     return alice_z, bob_z
 
@@ -271,14 +279,14 @@ def ecdh_mitm(g: PointXY):
     bob_point = gen_point(g, bob_x)
     eve_point = gen_point(g, eve_x)
 
-    point_from_bob = send_point(bob_point)
-    point_from_alice = send_point(alice_point)
-    point_from_eve = send_point(eve_point)
+    point_bob = send_point(bob_point)
+    point_alice = send_point(alice_point)
+    point_eve = send_point(eve_point)
 
-    alice_z = gen_point(point_from_eve, alice_x)
-    bob_z = gen_point(point_from_eve, bob_x)
-    eve_z_alice = gen_point(point_from_alice, eve_x)
-    eve_z_bob = gen_point(point_from_bob, eve_x)
+    alice_z = gen_point(point_eve, alice_x)
+    bob_z = gen_point(point_eve, bob_x)
+    eve_z_alice = gen_point(point_alice, eve_x)
+    eve_z_bob = gen_point(point_bob, eve_x)
 
     return alice_z, eve_z_alice, bob_z, eve_z_bob
 
@@ -298,16 +306,17 @@ if __name__ == "__main__":
     gx = int(0x8BD2AEB9CB7E57CB2C4B482FFC81B7AFB9DE27E1E3BD23C23A4453BD9ACE3262)
     gy = int(0x547EF835C3DAC4FD97F8461A14611DC9C27745132DED8E545C1D54C72F046997)
     gp = PointXY(gx,gy)
-    p1 = PointXYZ(60306380415904663168568911239273826053144841234228559299517684417361346433053,74653857005150983469598545140707432309023702960881435319026826228339031179596, 1)
+    p1 = PointXYZ(60306380415904663168568911239273826053144841234228559299517684417361346433053,
+                  74653857005150983469598545140707432309023702960881435319026826228339031179596, 1)
 
     """
     Test Punktaddition und Punktverdopplung (A6.1)
     """
-    p_val = on_homogenised_weierstrass(p1)
+    p_val = on_weierstrass(p1)
     p2 = p1.dbl()
     p3 = p1 + p2
-    p2_val = on_homogenised_weierstrass(p2)
-    p3_val = on_homogenised_weierstrass(p3)
+    p2_val = on_weierstrass(p2)
+    p3_val = on_weierstrass(p3)
     print(f'A6.1', f'p1: {p1}, valid: {p_val}', f'p2: {p2}, valid: {p2_val}', f'p3: {p3}, valid: {p3_val}', f'', sep='\n')
 
     """
@@ -316,7 +325,7 @@ if __name__ == "__main__":
     x = 45293862615914129592799868910073453280318120139794646860937486992939092186751
     p1_xy = p1.to_xy()
     p4 = p1_xy * x
-    p4_val = on_short_weierstrass(p4)
+    p4_val = on_weierstrass(p4)
     p4_xyz = p4.to_xyz()
     print(f'A6.2', f'p4: {p4_xyz}, valid: {p4_val}', f'', sep='\n')
 
@@ -344,19 +353,21 @@ if __name__ == "__main__":
     a = 16
     b = 20
     p = 31
-    g = PointXYZ(16,1,1)
-    g_xy = g.to_xy()
+    g_xyz = PointXYZ(16,1,1)
+    g_xy = g_xyz.to_xy()
     our_x = random.randint(0,100)
     #our_x = 0
     print(f'Geheimes x: {our_x}')
 
-    our_p = gen_point(g_xy,our_x)
+    our_p = gen_point(g_xy, our_x)
     print(f'Unser Punkt: {our_p}')
 
     #Punkt der anderen Gruppe einsetzen
-    their_p = PointXY(0,0)
+    their_x = int(input('Their x: '))
+    their_y = int(input('Their y: '))
+    their_point = PointXY(their_x, their_y) #(9, 26)
 
-    our_z = gen_point(their_p,our_x)
+    our_z = gen_point(their_point, our_x)
     print(f'Gemeinsames Geheimnis: {our_z}')
 
     #Generiertes Geheimnis der anderen Gruppe einfÃ¼gen

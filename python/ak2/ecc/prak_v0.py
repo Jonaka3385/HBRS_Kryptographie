@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import random
 
 
 """
@@ -118,7 +119,10 @@ class PointXYZ:
             y3 = (b_a * (b_b ** 2 * x1 * z2 - b_c) - b_b ** 3 * y1 * z2) % p
             z3 = (b_b ** 3 * z1 * z2) % p
 
-            return PointXYZ(x3, y3, z3)
+            new_p = PointXYZ(x3, y3, z3)
+            if z1 == 1 & z2 == 1:
+                new_p.normalise()
+            return new_p
 
     def __mul__(self, k: int):
         q = xyz_neutral
@@ -151,7 +155,10 @@ class PointXYZ:
             y3 = (b_a * (4 * b_c - b_d) - 8 * y1 ** 2 * b_b ** 2) % p
             z3 = (8 * b_b ** 3) % p
 
-            return PointXYZ(x3, y3, z3)
+            new_p = PointXYZ(x3, y3, z3)
+            if z1 == 1:
+                new_p.normalise()
+            return new_p
 
     def to_xy(self):
         if self.z == 0:
@@ -161,6 +168,12 @@ class PointXYZ:
             new_x = self.x * z_inv
             new_y = self.y * z_inv
             return PointXY(new_x, new_y)
+
+    def normalise(self):
+        tmp = self.to_xy()
+        self.x = tmp.x
+        self.y = tmp.y
+        self.z = 1
 
 
 xyz_neutral = PointXYZ(0, 1, 0)
@@ -204,6 +217,70 @@ def mod_inv(k, mod):
         raise ZeroDivisionError('Division durch Null')
     return pow(k, -1, mod)
 
+"""
+Elliptic Curve Diffie Hellman
+"""
+alice_x = 0
+bob_x = 0
+alice_p = 0
+bob_p = 0
+g = 0
+alice_z = 0
+bob_z = 0
+
+def gen_point(point: PointXY, x):
+    new_point = point * x
+    return new_point
+
+def send_point(point: PointXY):
+    return point
+
+def ecdh(point: PointXY):
+    alice_x = random.randint(0,100)
+    bob_x = random.randint(0,100)
+
+    alice_point = gen_point(point, alice_x)
+    bob_point = gen_point(point, bob_x)
+
+    point_from_bob = send_point(bob_point)
+    point_from_alice = send_point(alice_point)
+
+    alice_z = gen_point(point_from_bob, alice_x)
+    bob_z = gen_point(point_from_alice, bob_x)
+
+    return alice_z, bob_z
+
+def test_ecdh(key1: PointXY, key2: PointXY):
+    return key1 == key2
+
+
+"""
+Man-in-the-Middle ECDH
+"""
+eve_x = 0
+eve_p = 0
+eve_z_alice = 0
+eve_z_bob = 0
+
+def ecdh_mitm(g: PointXY):
+    alice_x = random.randint(0, 100)
+    bob_x = random.randint(0, 100)
+    eve_x = random.randint(0,100)
+
+    alice_point = gen_point(g, alice_x)
+    bob_point = gen_point(g, bob_x)
+    eve_point = gen_point(g, eve_x)
+
+    point_from_bob = send_point(bob_point)
+    point_from_alice = send_point(alice_point)
+    point_from_eve = send_point(eve_point)
+
+    alice_z = gen_point(point_from_eve, alice_x)
+    bob_z = gen_point(point_from_eve, bob_x)
+    eve_z_alice = gen_point(point_from_alice, eve_x)
+    eve_z_bob = gen_point(point_from_bob, eve_x)
+
+    return alice_z, eve_z_alice, bob_z, eve_z_bob
 
 """
 main() Methode
@@ -211,38 +288,78 @@ main() Methode
 if __name__ == "__main__":
     # Y^2*Z = X^3 + a*X*Z^2 + b*Z^3
     # y^2 = x^3 + a*X + b
+
+    """
+    Kurven-Parameter
+    """
     p = int(0xA9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5377)
     a = int(0x7D5A0975FC2C3057EEF67530417AFFE7FB8055C126DC5C6CE94A4B44F330B5D9)
     b = int(0x26DC5C6CE94A4B44F330B5D9BBD77CBF958416295CF7E1CE6BCCDC18FF8C07B6)
+    gx = int(0x8BD2AEB9CB7E57CB2C4B482FFC81B7AFB9DE27E1E3BD23C23A4453BD9ACE3262)
+    gy = int(0x547EF835C3DAC4FD97F8461A14611DC9C27745132DED8E545C1D54C72F046997)
+    gp = PointXY(gx,gy)
+    p1 = PointXYZ(60306380415904663168568911239273826053144841234228559299517684417361346433053,74653857005150983469598545140707432309023702960881435319026826228339031179596, 1)
 
-    point_p = PointXYZ(60306380415904663168568911239273826053144841234228559299517684417361346433053,
-                 74653857005150983469598545140707432309023702960881435319026826228339031179596, 1)
-    p_val = on_homogenised_weierstrass(point_p)
-    p2 = point_p.dbl()
+    """
+    Test Punktaddition und Punktverdopplung (A6.1)
+    """
+    p_val = on_homogenised_weierstrass(p1)
+    p2 = p1.dbl()
+    p3 = p1 + p2
     p2_val = on_homogenised_weierstrass(p2)
-    p3 = point_p + p2
     p3_val = on_homogenised_weierstrass(p3)
-    print(f'point: {point_p}, valid: {p_val}', f'p2 {p2}, valid: {p2_val}', f'p3 {p3}, valid: {p3_val}', f'', sep='\n')
+    print(f'A6.1', f'p1: {p1}, valid: {p_val}', f'p2: {p2}, valid: {p2_val}', f'p3: {p3}, valid: {p3_val}', f'', sep='\n')
 
-    point_p = PointXY(60306380415904663168568911239273826053144841234228559299517684417361346433053,
-                 74653857005150983469598545140707432309023702960881435319026826228339031179596)
-    p_val = on_short_weierstrass(point_p)
-    p2 = point_p.dbl()
-    p2_val = on_short_weierstrass(p2)
-    p3 = point_p + p2
-    p3_val = on_short_weierstrass(p3)
-    print(f'point: {point_p}, valid: {p_val}', f'p2 {p2}, valid: {p2_val}', f'p3 {p3}, valid: {p3_val}', f'', sep='\n')
+    """
+    Test Punktmultiplikation (A6.2)
+    """
+    x = 45293862615914129592799868910073453280318120139794646860937486992939092186751
+    p1_xy = p1.to_xy()
+    p4 = p1_xy * x
+    p4_val = on_short_weierstrass(p4)
+    p4_xyz = p4.to_xyz()
+    print(f'A6.2', f'p4: {p4_xyz}, valid: {p4_val}', f'', sep='\n')
 
-    #DH
-    Gf = PointXY(63243729749562333355292243550312970334778175571054726587095381623627144114786,
-                 38218615093753523893122277964030810387585405539772602581557831887485717997975)
-    x = 13
-    y = 21
-    xG = Gf * x
-    yG = Gf * y
-    y_xG = xG * y
-    x_yG = yG * x
-    print(f'Gf: {Gf}, {on_short_weierstrass(Gf)}',
-          f'xG: {xG}, {on_short_weierstrass(xG)}', f'yG: {yG}, {on_short_weierstrass(yG)}',
-          f'y_xG: {y_xG}, {on_short_weierstrass(y_xG)}', f'x_yG: {x_yG}, {on_short_weierstrass(x_yG)}',
-          f'{y_xG == x_yG}', f'xyG == yxG: {y_xG == x_yG}', sep='\n')
+    """
+    Test ECDH (A6.3.1)
+    """
+    com_key = ecdh(gp)
+    ck1, ck2 = com_key
+    print(f'A6.3.1', f'Gemeinsames Geheimnis: Alice{ck1}, Bob{ck2}, valid: {test_ecdh(com_key[0], com_key[1])}', f'', sep='\n')
+
+    """
+    Test Man-in-the-Middle ECDH (A6.3.3)
+    """
+    com_keys = ecdh_mitm(gp)
+    ck_1,ck_2,ck_3,ck_4 = com_keys
+    valid_alice_eve = test_ecdh(com_keys[0], com_keys[1])
+    valid_bob_eve = test_ecdh(com_keys[2], com_keys[3])
+    print(f'A6.3.3', f'Geheimnis(MitM): Alice{ck_1}, Eve{ck_2}, Valid: {valid_alice_eve}',
+          f'Geheimnis(MitM): Bob{ck_3}, Eve{ck_4}, Valid: {valid_bob_eve}', f'', sep='\n')
+
+    """
+    Gruppenarbeit (A6.3.4)
+    """
+    print(f'A6.3.4')
+    a = 16
+    b = 20
+    p = 31
+    g = PointXYZ(16,1,1)
+    g_xy = g.to_xy()
+    our_x = random.randint(0,100)
+    #our_x = 0
+    print(f'Geheimes x: {our_x}')
+
+    our_p = gen_point(g_xy,our_x)
+    print(f'Unser Punkt: {our_p}')
+
+    #Punkt der anderen Gruppe einsetzen
+    their_p = PointXY(0,0)
+
+    our_z = gen_point(their_p,our_x)
+    print(f'Gemeinsames Geheimnis: {our_z}')
+
+    #Generiertes Geheimnis der anderen Gruppe einfÃ¼gen
+    their_z = PointXY(0,0)
+
+    print(f'Valid: {test_ecdh(our_z, their_z)}')

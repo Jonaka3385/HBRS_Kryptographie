@@ -228,14 +228,6 @@ def mod_inv(k, mod):
 """
 Elliptic Curve Diffie Hellman
 """
-alice_x = 0
-bob_x = 0
-alice_p = 0
-bob_p = 0
-g = 0
-alice_z = 0
-bob_z = 0
-
 def gen_point(point: PointXY, x):
     new_point = point * x
     return new_point
@@ -253,10 +245,10 @@ def ecdh(point: PointXY):
     point_bob = send_point(bob_point)
     point_alice = send_point(alice_point)
 
-    alice_z = gen_point(point_bob, alice_x)
-    bob_z = gen_point(point_alice, bob_x)
+    alice_secret_point = gen_point(point_bob, alice_x)
+    bob_secret_point = gen_point(point_alice, bob_x)
 
-    return alice_z, bob_z
+    return alice_secret_point, bob_secret_point
 
 def test_ecdh(key1: PointXY, key2: PointXY):
     return key1 == key2
@@ -265,30 +257,25 @@ def test_ecdh(key1: PointXY, key2: PointXY):
 """
 Man-in-the-Middle ECDH
 """
-eve_x = 0
-eve_p = 0
-eve_z_alice = 0
-eve_z_bob = 0
-
-def ecdh_mitm(g: PointXY):
+def ecdh_mitm(point: PointXY):
     alice_x = random.randint(0, 100)
     bob_x = random.randint(0, 100)
     eve_x = random.randint(0,100)
 
-    alice_point = gen_point(g, alice_x)
-    bob_point = gen_point(g, bob_x)
-    eve_point = gen_point(g, eve_x)
+    alice_point = gen_point(point, alice_x)
+    bob_point = gen_point(point, bob_x)
+    eve_point = gen_point(point, eve_x)
 
     point_bob = send_point(bob_point)
     point_alice = send_point(alice_point)
     point_eve = send_point(eve_point)
 
-    alice_z = gen_point(point_eve, alice_x)
-    bob_z = gen_point(point_eve, bob_x)
-    eve_z_alice = gen_point(point_alice, eve_x)
-    eve_z_bob = gen_point(point_bob, eve_x)
+    alice_secret_point = gen_point(point_eve, alice_x)
+    bob_secret_point = gen_point(point_eve, bob_x)
+    eve_secret_point_alice = gen_point(point_alice, eve_x)
+    eve_secret_point_bob = gen_point(point_bob, eve_x)
 
-    return alice_z, eve_z_alice, bob_z, eve_z_bob
+    return alice_secret_point, eve_secret_point_alice, bob_secret_point, eve_secret_point_bob
 
 """
 main() Methode
@@ -367,10 +354,12 @@ if __name__ == "__main__":
     their_y = int(input('Their y: '))
     their_point = PointXY(their_x, their_y) #(9, 26)
 
-    our_z = gen_point(their_point, our_x)
-    print(f'Gemeinsames Geheimnis: {our_z}')
+    our_secret_point = gen_point(their_point, our_x)
+    print(f'Gemeinsames Geheimnis: {our_secret_point}')
 
     #Generiertes Geheimnis der anderen Gruppe einfÃ¼gen
-    their_z = PointXY(0,0)
+    their_secret_x = int(input('Their x: '))
+    their_secret_y = int(input('Their y: '))
+    their_secret_point = PointXY(their_x, their_y)
 
-    print(f'Valid: {test_ecdh(our_z, their_z)}')
+    print(f'Valid: {test_ecdh(our_secret_point, their_secret_point)}')

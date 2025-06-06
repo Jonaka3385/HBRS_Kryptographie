@@ -1,27 +1,10 @@
-from ak2.ecc.Points import PointXY, PointXYZ
+from ak2.ecc.Points import PointXY
 from ak2.ecc.Weierstrass import WeierstrassCurve
-import random
 
 
-"""
-Elliptic Curve Diffie Hellman
-"""
 def gen_point(point: PointXY, x):
     new_point = point * x
     return new_point
-
-def ecdh(point: PointXY):
-    alice_x = random.randint(0,100)
-    bob_x = random.randint(0,100)
-
-    point_alice = gen_point(point, alice_x)
-    point_bob = gen_point(point, bob_x)
-
-    alice_secret_point = gen_point(point_bob, alice_x)
-    bob_secret_point = gen_point(point_alice, bob_x)
-
-    return alice_secret_point, bob_secret_point
-
 
 """
 main() Methode

@@ -54,6 +54,7 @@ class PointXY:
 
     def __mul__(self, k: int):
         q = xy_neutral
+        # while k < 0 + p ??? oder n ???
         kb = bin(k)
         # k = 2  ->  kb = '0b10'
         j = len(kb)
@@ -67,7 +68,7 @@ class PointXY:
         return f'({self.x}, {self.y})'
 
     def dbl(self):
-        if self.neutral or self.y == 0:
+        if self.neutral:
             return xy_neutral
         else:
             a = self.curve.a

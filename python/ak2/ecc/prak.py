@@ -57,7 +57,7 @@ class PointXY:
         return f'({self.x}, {self.y})'
 
     def dbl(self):
-        if self == xy_neutral or self.y == 0:
+        if self == xy_neutral:
             return xy_neutral
         else:
             x1, y1 = self.x, self.y

@@ -2,6 +2,9 @@ from ak2.ecc.Weierstrass import WeierstrassCurve
 from ak2.ecc.MyMath import mod_inv
 
 
+"""
+Affiner Punkt
+"""
 class PointXY:
     x: int
     y: int
@@ -83,6 +86,12 @@ class PointXY:
             return xyz_neutral
         return PointXYZ(self.x, self.y, 1, self.curve)
 
+    def on_curve(self):
+        return self.curve.on_short(self)
+
+"""
+Projektiver Punkt
+"""
 class PointXYZ:
     x: int
     y: int
@@ -197,6 +206,12 @@ class PointXYZ:
     def is_neutral(self):
         return self.z == 0
 
+    def on_curve(self):
+        return self.curve.on_homogenised(self)
+
+"""
+Neutrale Punkte
+"""
 tmp = WeierstrassCurve(0, 0, 0)
 xy_neutral = PointXY(0, 0, tmp)
 xy_neutral.neutral = True

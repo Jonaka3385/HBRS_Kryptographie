@@ -78,11 +78,11 @@ if __name__ == "__main__":
     """
     Test Punktaddition und Punktverdopplung (A6.1)
     """
-    p_val = curve.on_homogenised(p1)
+    p_val = p1.on_curve()
     p2 = p1.dbl()
     p3 = p1 + p2
-    p2_val = curve.on_homogenised(p2)
-    p3_val = curve.on_homogenised(p3)
+    p2_val = p2.on_curve()
+    p3_val = p3.on_curve()
     print(f'A6.1', f'p1: {p1}, valid: {p_val}', f'p2: {p2}, valid: {p2_val}', f'p3: {p3}, valid: {p3_val}', f'', sep='\n')
 
     """
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     x = 45293862615914129592799868910073453280318120139794646860937486992939092186751
     p1_xy = p1.to_xy()
     p4 = p1_xy * x
-    p4_val = curve.on_short(p4)
+    p4_val = p4.on_curve()
     p4_xyz = p4.to_xyz()
     print(f'A6.2', f'p4: {p4_xyz}, valid: {p4_val}', f'', sep='\n')
 

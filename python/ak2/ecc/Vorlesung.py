@@ -22,7 +22,7 @@ if __name__ == "__main__":
     curve = WeierstrassCurve(a, b, p)
     g2 = PointXY(25, 24, curve)
     g_mod = 7
-    print(f'Generator: {g2}', f'Generator Modulo: {g_mod}', f'', sep='\n')
+    print(f'Generator: {g2}', f'Modulo: {g_mod}', f'', sep='\n')
 
     d1 = int(input('d1: '))
     print(f'{d1} mod {g_mod} = {d1 % g_mod}')

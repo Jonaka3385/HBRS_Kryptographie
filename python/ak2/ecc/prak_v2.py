@@ -31,7 +31,6 @@ def ecdh(point: PointXY):
 def test_ecdh(key1: PointXY, key2: PointXY):
     return key1 == key2
 
-
 """
 Man-in-the-Middle ECDH
 """
@@ -55,12 +54,14 @@ def ecdh_mitm(point: PointXY):
 
     return alice_secret_point, eve_secret_point_alice, bob_secret_point, eve_secret_point_bob
 
+
 """
 main() Methode
 """
 if __name__ == "__main__":
     # Y^2*Z = X^3 + a*X*Z^2 + b*Z^3
     # y^2 = x^3 + a*X + b
+
 
     """
     Kurven-Parameter
@@ -75,6 +76,7 @@ if __name__ == "__main__":
     p1 = PointXYZ(60306380415904663168568911239273826053144841234228559299517684417361346433053,
                   74653857005150983469598545140707432309023702960881435319026826228339031179596, 1, curve)
 
+
     """
     Test Punktaddition und Punktverdopplung (A6.1)
     """
@@ -84,6 +86,7 @@ if __name__ == "__main__":
     p2_val = curve.on_homogenised(p2)
     p3_val = curve.on_homogenised(p3)
     print(f'A6.1', f'p1: {p1}, valid: {p_val}', f'p2: {p2}, valid: {p2_val}', f'p3: {p3}, valid: {p3_val}', f'', sep='\n')
+
 
     """
     Test Punktmultiplikation (A6.2)
@@ -95,12 +98,14 @@ if __name__ == "__main__":
     p4_xyz = p4.to_xyz()
     print(f'A6.2', f'p4: {p4_xyz}, valid: {p4_val}', f'', sep='\n')
 
+
     """
     Test ECDH (A6.3.1)
     """
     com_key = ecdh(gp)
     ck1, ck2 = com_key
     print(f'A6.3.1', f'Gemeinsames Geheimnis: Alice{ck1}, Bob{ck2}, valid: {test_ecdh(com_key[0], com_key[1])}', f'', sep='\n')
+
 
     """
     Test Man-in-the-Middle ECDH (A6.3.3)
@@ -111,6 +116,7 @@ if __name__ == "__main__":
     valid_bob_eve = test_ecdh(com_keys[2], com_keys[3])
     print(f'A6.3.3', f'Geheimnis(MitM): Alice{ck_1}, Eve{ck_2}, Valid: {valid_alice_eve}',
           f'Geheimnis(MitM): Bob{ck_3}, Eve{ck_4}, Valid: {valid_bob_eve}', f'', sep='\n')
+
 
     """
     Gruppenarbeit (A6.3.4)
